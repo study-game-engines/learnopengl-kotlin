@@ -11,9 +11,10 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3f
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
@@ -72,7 +73,6 @@ val verticesCube0 = floatArrayOf(
 )
 
 private class BasicLightingDiffuse {
-
     val window = initWindow0("Basic Lighting Diffuse")
 
     val lighting = Lighting()
@@ -131,11 +131,8 @@ private class BasicLightingDiffuse {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
@@ -167,9 +164,7 @@ private class BasicLightingDiffuse {
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
-            model = model
-                .translate(lightPos)
-                .scale(0.2f) // a smaller cube
+            model = model.translate(lightPos).scale(0.2f)
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])

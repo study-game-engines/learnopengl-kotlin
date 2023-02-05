@@ -15,10 +15,11 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -100,6 +101,7 @@ private class MultipleLights {
         inner class Material {
             val shininess = glGetUniformLocation(name, "material.shininess")
         }
+
     }
 
     open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
@@ -158,11 +160,13 @@ private class MultipleLights {
             glUniform(lighting.viewPos, camera.position)
             glUniform(lighting.mtl.shininess, 32f)
 
-            /*  Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
+            /*
+                Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
                 the proper PointLight struct in the array to set each uniform variable. This can be done more
                 code-friendly by defining light types as classes and set their values in there, or by using a more
                 efficient uniform approach by using 'Uniform buffer objects', but that is something we'll discuss in
-                the 'Advanced GLSL' tutorial.        */
+                the 'Advanced GLSL' tutorial.
+            */
             // directional light
             with(lighting.dirLight) {
                 glUniform(dir, -0.2f, -1f, -0.3f)
@@ -195,7 +199,6 @@ private class MultipleLights {
                 glUniform(outerCutOff, 15f.rad.cos)
             }
 
-
             // view/projection transformations
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100.0f)
             val view = camera.viewMatrix
@@ -212,7 +215,6 @@ private class MultipleLights {
             // render containers
             glBindVertexArray(vao[VA.Cube])
             cubePositions.forEachIndexed { i, pos ->
-
                 // calculate the model matrix for each object and pass it to shader before drawing
                 val model = Mat4().translate(pos)
                 val angle = 20f * i

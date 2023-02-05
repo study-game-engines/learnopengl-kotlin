@@ -5,7 +5,6 @@ import glm_.glm
 import glm_.mat4x4.Mat4
 import glm_.set
 import gln.draw.glDrawArrays
-import gln.framebuffer.glBindFramebuffer
 import gln.framebuffer.glFramebufferRenderbuffer
 import gln.get
 import gln.glClearColor
@@ -16,7 +15,6 @@ import gln.renderbuffer.glBindRenderbuffer
 import gln.renderbuffer.glRenderbufferStorage
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.a_gettingStarted.windowSize
@@ -24,17 +22,18 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import java.awt.Color
+import java.nio.ByteBuffer
+import java.nio.IntBuffer
 
 fun main() {
     with(Framebuffers()) {
@@ -44,7 +43,6 @@ fun main() {
 }
 
 private class Framebuffers {
-
     val window = initWindow0("Framebuffers")
 
     val programRender = ProgramRender()
@@ -60,7 +58,7 @@ private class Framebuffers {
     val tex = intBufferBig<Tex>()
 
     var rbo = intBufferBig(1)
-    val framebuffer = intBufferBig(1)
+    val framebuffer: IntBuffer = intBufferBig(1)
 
     /** vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates. */
     val quadVertices = floatArrayOf(
@@ -74,7 +72,7 @@ private class Framebuffers {
         +1f, +1f, 1f, 1f
     )
 
-    inner open class ProgramRender : Program("shaders/d/_5_1", "framebuffers.vert", "framebuffers.frag") {
+    open inner class ProgramRender : Program("shaders/d/_5_1", "framebuffers.vert", "framebuffers.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -85,7 +83,7 @@ private class Framebuffers {
         }
     }
 
-    inner open class ProgramSplash : Program("shaders/d/_5_1", "framebuffers-screen.vert", "framebuffers-screen.frag") {
+    open inner class ProgramSplash : Program("shaders/d/_5_1", "framebuffers-screen.vert", "framebuffers-screen.frag") {
         init {
             usingProgram(this.name) { "screenTexture".unit = semantic.sampler.DIFFUSE }
         }
@@ -93,12 +91,10 @@ private class Framebuffers {
 
     init {
         glEnable(GL_DEPTH_TEST)
-
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             if (i == Object.Quad) {
@@ -119,11 +115,22 @@ private class Framebuffers {
         // framebuffer configuration
         // -------------------------
         glGenFramebuffers(framebuffer)
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer[0])
         // create a color attachment texture
         tex[Tex.ColorBuffer.ordinal] = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, tex[Tex.ColorBuffer])
-        glTexImage2D(GL_RGB8, windowSize, GL_RGB, GL_UNSIGNED_BYTE)
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGB8,
+            windowSize.x,
+            windowSize.y,
+            0,
+            GL_RGB,
+            GL_UNSIGNED_BYTE,
+            null as ByteBuffer?
+        )
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex[Tex.ColorBuffer], 0)
@@ -144,7 +151,7 @@ private class Framebuffers {
         // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             System.err.println("ERROR::FRAMEBUFFER:: Framebuffer is not complete!")
-        glBindFramebuffer(GL_FRAMEBUFFER)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
         // draw as wireframe
 //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -152,14 +159,12 @@ private class Framebuffers {
 
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
 
             // render
             // bind to framebuffer and draw scene as we normally would to color texture
-            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer[0])
             glEnable(GL_DEPTH_TEST) // enable depth testing (is disabled for rendering screen-space quad)
 
             // make sure we clear the framebuffer's content
@@ -179,8 +184,7 @@ private class Framebuffers {
             model.translate_(-1f, 0f, -1f)
             glUniform(programRender.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
-            model = Mat4()
-                .translate_(2f, 0f, 0f)
+            model = Mat4().translate_(2f, 0f, 0f)
             glUniform(programRender.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
             // floor
@@ -194,15 +198,13 @@ private class Framebuffers {
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glDisable(GL_DEPTH_TEST) // disable depth test so screen-space quad isn't discarded due to depth test.
             // clear all relevant buffers
-            glClearColor(Color.white) // not really necessary actually, since we won't be able to see behind the quad anyways
+            glClearColor(1f, 1f, 1f, 1f)
             glClear(GL_COLOR_BUFFER_BIT)
 
             glUseProgram(programSplash.name)
             glBindVertexArray(vao[Object.Quad])
-            glBindTexture(
-                GL_TEXTURE_2D,
-                tex[Tex.ColorBuffer]
-            )    // use the color attachment texture as the texture of the quad plane
+            // use the color attachment texture as the texture of the quad plane
+            glBindTexture(GL_TEXTURE_2D, tex[Tex.ColorBuffer])
             glDrawArrays(GL_TRIANGLES, 6)
 
             window.swapAndPoll()

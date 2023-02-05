@@ -21,6 +21,7 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -31,6 +32,7 @@ import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
 import uno.kotlin.uri
+import learnOpenGL.common.glEnableVertexAttribArray
 
 fun main() {
     with(DepthTesting()) {
@@ -102,7 +104,7 @@ private class DepthTesting {
         val extent = texture.extent()
 
         glBindTexture(GL_TEXTURE_2D, textureID)
-        glTexImage2D(format.internal, extent.x, extent.y, format.external, format.type, texture.data())
+        glTexImage2D(GL_TEXTURE_2D, 0, format.internal.i, extent.x, extent.y, 0, format.external.i, format.type.i, texture.data())
         glGenerateMipmap(GL_TEXTURE_2D)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)

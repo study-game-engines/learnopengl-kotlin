@@ -11,7 +11,6 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.a_gettingStarted.verticesCube
@@ -19,6 +18,8 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
@@ -44,7 +45,6 @@ private class DepthTestingView {
     val tex = intBufferBig<Object>()
 
     init {
-
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LESS)
 

@@ -73,7 +73,6 @@ fun shaderOf(context: KClass<*>, root: String, vertexName: String, fragmentName:
     return id
 }
 
-// utility function for checking shader compilation/linking errors
 fun checkCompileErrors(shader: Int, type: String) {
     if (type != "program") {
         if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {

@@ -11,9 +11,10 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
@@ -58,7 +59,6 @@ private class BasicLightingSpecular {
     init {
         glEnable(GL_DEPTH_TEST)
 
-
         glGenVertexArrays(vao)
 
         // first, configure the cube's VAO (and VBO)
@@ -84,9 +84,7 @@ private class BasicLightingSpecular {
 
     fun run() {
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
@@ -96,9 +94,8 @@ private class BasicLightingSpecular {
             glUseProgram(lighting.name)
 
             glUniform(lighting.objCol, 1f, 0.5f, 0.31f)
-            /*  we can avoid to write this
-                glUniform(lighting.lgtCol, 1.0f, 1.0f, 1.0f)
-                but we have to specify explicit the dimensionality with 3*/
+
+            // we can avoid to write this glUniform(lighting.lgtCol, 1.0f, 1.0f, 1.0f) but we have to specify explicit the dimensionality with 3
             glUniform3(lighting.lgtCol, 1f)
             glUniform(lighting.lgtPos, lightPos)
             glUniform(lighting.viewPos, camera.position)
@@ -123,9 +120,7 @@ private class BasicLightingSpecular {
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
-            model = model
-                .translate(lightPos)
-                .scale(0.2f) // a smaller cube
+            model = model.translate(lightPos).scale(0.2f)
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])

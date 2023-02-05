@@ -14,10 +14,11 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -35,7 +36,6 @@ fun main() {
 }
 
 private class LightCastersSpot {
-
     val window = initWindow0("Light Caster Spot")
 
     val lighting = Lighting()
@@ -74,7 +74,7 @@ private class LightCastersSpot {
         }
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
         Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
@@ -83,9 +83,7 @@ private class LightCastersSpot {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
         glGenVertexArrays(vao)
 
         // first, configure the cube's VAO (and VBO)
@@ -120,11 +118,8 @@ private class LightCastersSpot {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
@@ -139,9 +134,8 @@ private class LightCastersSpot {
 
             // light properties
             glUniform3(lighting.lgt.ambient, 0.1f)
-            /*  we configure the diffuse intensity slightly higher; the right lighting conditions differ with each
-                lighting method and environment.
-                each environment and lighting type requires some tweaking to get the best out of your environment.   */
+
+            // we configure the diffuse intensity slightly higher; the right lighting conditions differ with each lighting method and environment. each environment and lighting type requires some tweaking to get the best out of your environment.
             glUniform3(lighting.lgt.diffuse, 0.8f)
             glUniform3(lighting.lgt.specular, 1f)
             glUniform(lighting.lgt.constant, 1f)
@@ -167,7 +161,6 @@ private class LightCastersSpot {
             // render containers
             glBindVertexArray(vao[VA.Cube])
             cubePositions.forEachIndexed { i, pos ->
-
                 // calculate the model matrix for each object and pass it to shader before drawing
                 val model = Mat4().translate(pos)
                 val angle = 20f * i

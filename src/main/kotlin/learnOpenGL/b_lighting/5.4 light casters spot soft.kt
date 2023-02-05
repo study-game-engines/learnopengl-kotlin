@@ -14,10 +14,11 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -35,12 +36,10 @@ fun main() {
 }
 
 private class LightCastersSpotSoft {
-
     val window = initWindow0("Light Caster Spot Soft")
 
     val lighting = Lighting()
     val lamp = Lamp()
-
     val vbo = intBufferBig(1)
 
     enum class VA { Cube, Light }
@@ -73,6 +72,7 @@ private class LightCastersSpotSoft {
         inner class Material {
             val shininess = glGetUniformLocation(name, "material.shininess")
         }
+
     }
 
     open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
@@ -84,10 +84,7 @@ private class LightCastersSpotSoft {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
-
         glGenVertexArrays(vao)
 
         // first, configure the cube's VAO (and VBO)
@@ -139,9 +136,6 @@ private class LightCastersSpotSoft {
 
             // light properties
             glUniform3(lighting.lgt.ambient, 0.1f)
-            /*  we configure the diffuse intensity slightly higher; the right lighting conditions differ with each
-                lighting method and environment.
-                each environment and lighting type requires some tweaking to get the best out of your environment.   */
             glUniform3(lighting.lgt.diffuse, 0.8f)
             glUniform3(lighting.lgt.specular, 1f)
             glUniform(lighting.lgt.constant, 1f)

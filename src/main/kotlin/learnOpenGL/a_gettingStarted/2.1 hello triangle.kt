@@ -1,18 +1,11 @@
 package learnOpenGL.a_gettingStarted
 
-// import imgui.impl.LwjglGL3
-import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawArrays
 import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
-import imgui.ImGui
-import imgui.WindowFlags
-import imgui.or
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glDeleteVertexArrays
 import org.lwjgl.opengl.GL30.glGenVertexArrays
@@ -117,9 +110,6 @@ private class HelloTriangle {
             Modifying other VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs)
             when it's not directly necessary.   */
         glBindVertexArray()
-
-        // Setup ImGui binding
-        LwjglGL3.init(window, true)
     }
 
     var showOverlay = true
@@ -130,19 +120,6 @@ private class HelloTriangle {
         while (window.open) {
 
             window.processInput()
-            LwjglGL3.newFrame()
-
-            with(ImGui) {
-                setNextWindowPos(Vec2(10))
-                withWindow(
-                    "Overlay",
-                    ::showOverlay,
-                    WindowFlags.NoTitleBar or WindowFlags.NoResize or WindowFlags.AlwaysAutoResize or WindowFlags.NoMove or WindowFlags.NoSavedSettings
-                ) {
-                    text("Polygon Mode:")
-                    radioButton("GL_LINE", ::polygonMode, 0); sameLine(); radioButton("GL_FILL", ::polygonMode, 1)
-                }
-            }
 
             glPolygonMode(GL_FRONT_AND_BACK, if (polygonMode == 0) GL_LINE else GL_FILL)
 
@@ -158,17 +135,12 @@ private class HelloTriangle {
             glDrawArrays(GL_TRIANGLES, 3)
             // glBindVertexArray() // no need to unbind it every time
 
-
-            ImGui.render()
             //  glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             window.swapAndPoll()
         }
     }
 
     fun end() {
-        LwjglGL3.shutdown()
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(shaderProgram)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)

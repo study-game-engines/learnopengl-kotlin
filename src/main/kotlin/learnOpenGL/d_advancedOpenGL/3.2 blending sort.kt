@@ -19,6 +19,7 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -27,6 +28,7 @@ import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
+import learnOpenGL.common.glEnableVertexAttribArray
 
 fun main() {
     with(BlendingSort()) {
@@ -46,7 +48,7 @@ private class BlendingSort {
     val vbo = intBufferBig<Object>()
     val tex = intBufferBig<Object>()
 
-    inner open class ProgramA : Program("shaders/d/_3_1", "blending.vert", "blending.frag") {
+    open inner class ProgramA : Program("shaders/d/_3_1", "blending.vert", "blending.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")

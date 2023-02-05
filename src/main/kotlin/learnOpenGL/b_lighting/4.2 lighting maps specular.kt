@@ -14,9 +14,10 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -67,6 +68,7 @@ private class LightingMapsSpecular {
         inner class Material {
             val shininess = glGetUniformLocation(name, "material.shininess")
         }
+
     }
 
     open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
@@ -78,9 +80,7 @@ private class LightingMapsSpecular {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
 
         glGenVertexArrays(vao)
 
@@ -163,14 +163,11 @@ private class LightingMapsSpecular {
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
-            model = model
-                .translate(lightPos)
-                .scale(0.2f) // a smaller cube
+            model = model.translate(lightPos).scale(0.2f)
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
             glDrawArrays(GL_TRIANGLES, 36)
-
 
             window.swapAndPoll()
         }

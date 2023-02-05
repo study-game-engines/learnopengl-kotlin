@@ -19,7 +19,6 @@ buildscript {
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     api 'com.github.kotlin-graphics:assimp:v4.0'
-    api 'com.github.kotlin-graphics:imgui:v1.79'
 
     switch ( OperatingSystem.current() ) {
         case OperatingSystem.WINDOWS:

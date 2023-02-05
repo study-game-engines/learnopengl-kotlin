@@ -9,9 +9,7 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
-import learnOpenGL.common.flipY
-import learnOpenGL.common.readImage
-import learnOpenGL.common.toBuffer
+import learnOpenGL.common.*
 import org.lwjgl.opengl.EXTABGR
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL12.GL_BGR
@@ -19,7 +17,6 @@ import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
 import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
-import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
@@ -31,6 +28,7 @@ fun main() {
         end()
     }
 }
+
 
 private class TexturesCombined {
     val window = initWindow("Textures Combined")
@@ -61,11 +59,8 @@ private class TexturesCombined {
     inner class ProgramA : Program("shaders/a/_4_2", "texture.vert", "texture.frag") {
         init {
             usingProgram(name) {
-                // either set it manually like so:
-                val textureA_location = glGetUniformLocation(name, "textureA")
-                glUniform1i(textureA_location, Texture.A.ordinal)
-                // or set it via glNext
-                "textureB".unitE = Texture.B
+                uniform("textureA", Texture.A.ordinal)
+                uniform("textureB", Texture.B.ordinal)
             }
         }
     }
@@ -108,7 +103,7 @@ private class TexturesCombined {
         // load image, create texture and generate mipmaps
         var image = readImage("textures/container.jpg").flipY()
         image.toBuffer().use {
-            glTexImage2D(GL_RGB, image.width, image.height, GL_BGR, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_BGR, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
@@ -125,7 +120,7 @@ private class TexturesCombined {
         image = readImage("textures/awesomeface.png").flipY()
         image.toBuffer().use {
             // ByteBuffered images used BRGA instead RGBA
-            glTexImage2D(GL_RGB, image.width, image.height, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
@@ -136,9 +131,7 @@ private class TexturesCombined {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processInput()
 
             //  render

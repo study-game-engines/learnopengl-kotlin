@@ -4,6 +4,8 @@ import gli_.*
 import gli_.Target
 import glm_.set
 import glm_.vec3.Vec3i
+import gln.glf.VertexAttribute
+import gln.glf.VertexLayout
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
 import org.lwjgl.opengl.GL11.glTexImage2D
@@ -11,13 +13,18 @@ import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
 import org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R
 import org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP
 import org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X
+import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.GL20C
 import org.lwjgl.opengl.GL30
+import org.lwjgl.system.MemoryUtil
 import uno.buffer.toBuf
 import uno.glfw.GlfwWindow
+import uno.glsl.Program
 import uno.kotlin.uri
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.File
+import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.imageio.ImageIO
@@ -34,7 +41,7 @@ fun readImage(filePath: String): BufferedImage {
     return ImageIO.read(file)
 }
 
-fun BufferedImage.toBuffer() = (raster.dataBuffer as DataBufferByte).data.toBuf()
+fun BufferedImage.toBuffer(): ByteBuffer = (raster.dataBuffer as DataBufferByte).data.toBuf()
 
 fun BufferedImage.flipY(): BufferedImage {
     var scanline1: Any? = null
@@ -49,7 +56,6 @@ fun BufferedImage.flipY(): BufferedImage {
 }
 
 fun loadTexture(path: String): Int {
-
     val textureID = GL11.glGenTextures()
 
     val texture = gli.load(path.uri)
@@ -94,7 +100,17 @@ fun loadCubemap(path: String, extension: String): Int {
         val format = gli.gl.translate(texture.format, texture.swizzles)
 
         val extend = texture.extent()
-        GL11.glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format.internal.i, extend.x, extend.y, 0, format.external.i, format.type.i, texture.data())
+        GL11.glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            format.internal.i,
+            extend.x,
+            extend.y,
+            0,
+            format.external.i,
+            format.type.i,
+            texture.data()
+        )
         GL30.glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
         GL11.glTexParameteri(GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         GL11.glTexParameteri(GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
@@ -111,7 +127,7 @@ fun loadCubemap(path: String, extension: String): Int {
 fun loadImage(path: Path): Texture {
     val image = ImageIO.read(path.toFile())
     val data = (image.raster.dataBuffer as DataBufferByte).data
-    val format = when (image.type) {
+    val format: Format = when (image.type) {
         BufferedImage.TYPE_3BYTE_BGR -> { // switch blue and red
             repeat(image.width * image.height) {
                 val tmp = data[it * 3]  // save blue
@@ -139,4 +155,45 @@ fun loadImage(path: Path): Texture {
     }
     return Texture(Target._2D, format, Vec3i(image.width, image.height, 1), 1, 1, 1)
         .apply { with(data()) { for (i in 0 until size) set(i, data[i]) } }
+}
+
+fun ByteBuffer.use(block: (ByteBuffer) -> Unit) {
+    try {
+        return block(this)
+    } catch (e: Throwable) {
+        throw e
+    } finally {
+        MemoryUtil.memFree(this)
+    }
+}
+
+fun Program.uniform(uniformName: String, textureId: Int) {
+    GL30.glUniform1i(GL20.glGetUniformLocation(name, uniformName), textureId)
+}
+
+fun glVertexAttribPointer(vertexLayout: VertexLayout) {
+    for (attribute in vertexLayout.attributes) {
+        glVertexAttribPointer(attribute)
+    }
+}
+
+fun glVertexAttribPointer(attribute: VertexAttribute) {
+    GL20.glVertexAttribPointer(
+        /* index = */ attribute.index,
+        /* size = */ attribute.size,
+        /* type = */ attribute.type,
+        /* normalized = */ attribute.normalized,
+        /* stride = */ attribute.interleavedStride,
+        /* pointer = */ attribute.pointer
+    )
+}
+
+fun glEnableVertexAttribArray(vertexLayout: VertexLayout) {
+    for (attribute in vertexLayout.attributes) {
+        glEnableVertexAttribArray(attribute)
+    }
+}
+
+fun glEnableVertexAttribArray(attribute: VertexAttribute) {
+    GL20C.glEnableVertexAttribArray(attribute.index)
 }

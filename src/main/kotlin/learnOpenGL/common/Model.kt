@@ -6,7 +6,6 @@ import assimp.Importer
 import uno.kotlin.uri
 
 class Model(path: String) {
-    /*  Model Data */
     val meshes = ArrayList<Mesh>()
 
     /** Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.  */

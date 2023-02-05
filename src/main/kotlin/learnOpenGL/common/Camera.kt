@@ -12,7 +12,12 @@ import learnOpenGL.common.Camera.Movement.*
 /**
  * An abstract camera class that processes input and calculates the corresponding Eular Angles, Vectors and Matrices
  */
-class Camera(var position: Vec3 = Vec3(), var worldUp: Vec3 = Vec3(0f, 1f, 0f), var yaw: Float = -90f, var pitch: Float = 0f) {
+class Camera(
+    var position: Vec3 = Vec3(),
+    var worldUp: Vec3 = Vec3(0f, 1f, 0f),
+    var yaw: Float = -90f,
+    var pitch: Float = 0f
+) {
 
     //  Camera Attributes
     var front = Vec3(0f, 0f, -1f)
@@ -35,8 +40,10 @@ class Camera(var position: Vec3 = Vec3(), var worldUp: Vec3 = Vec3(0f, 1f, 0f), 
     /** Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
     val viewMatrix get() = glm.lookAt(position, position + front, up)
 
-    /**  Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera
-     *   defined ENUM (to abstract it from windowing systems)    */
+    /**
+     *  Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera
+     *  defined ENUM (to abstract it from windowing systems)
+     */
     fun processKeyboard(direction: Movement, deltaTime: Float) {
 
         val velocity = movementSpeed * deltaTime
@@ -53,7 +60,6 @@ class Camera(var position: Vec3 = Vec3(), var worldUp: Vec3 = Vec3(0f, 1f, 0f), 
     infix fun processMouseMovement(offset: Vec2d) = processMouseMovement(offset, true)
 
     fun processMouseMovement(offset: Vec2d, constrainPitch: Boolean = true) {
-
         val x = offset.x * mouseSensitivity
         val y = offset.y * mouseSensitivity
 
@@ -61,24 +67,22 @@ class Camera(var position: Vec3 = Vec3(), var worldUp: Vec3 = Vec3(0f, 1f, 0f), 
         pitch += y.f
 
         // Make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (constrainPitch)
+        if (constrainPitch) {
             pitch = glm.clamp(pitch, -89f, 89f)
+        }
 
         // Update Front, Right and Up Vectors using the updated Eular angles
         updateCameraVectors()
     }
 
-    /** Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis    */
     fun processMouseScroll(yOffset: Float) {
-
-        if (zoom in 1f..45f)
+        if (zoom in 1f..45f) {
             zoom -= yOffset
-
+        }
         zoom = glm.clamp(zoom, 1f, 45f)
     }
 
-    /** Calculates the front vector from the Camera's (updated) Eular Angles    */
-    fun updateCameraVectors() {
+    private fun updateCameraVectors() {
         // Calculate the new Front vector
         front.put(
             x = yaw.rad.cos * pitch.rad.cos,

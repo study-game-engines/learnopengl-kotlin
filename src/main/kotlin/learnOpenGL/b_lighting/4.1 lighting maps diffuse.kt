@@ -14,9 +14,10 @@ import gln.glf.semantic
 import gln.texture.glBindTexture
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -79,7 +80,6 @@ val verticesCube1 = floatArrayOf(
 )
 
 private class LightingMapsDiffuse {
-
     val window = initWindow0("Lighting Maps Diffuse")
 
     val lighting = Lighting()
@@ -123,10 +123,7 @@ private class LightingMapsDiffuse {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
-
         glGenVertexArrays(vao)
 
         // first, configure the cube's VAO (and VBO)
@@ -154,11 +151,8 @@ private class LightingMapsDiffuse {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
@@ -198,7 +192,7 @@ private class LightingMapsDiffuse {
 
 
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
@@ -210,21 +204,18 @@ private class LightingMapsDiffuse {
             glBindVertexArray(vao[VA.Light])
             glDrawArrays(GL_TRIANGLES, 36)
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
         glDeleteProgram(lighting.name)
         glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(diffuseMap)
-
         destroyBuf(vao, vbo, diffuseMap)
-
         window.end()
     }
+
 }

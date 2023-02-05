@@ -12,7 +12,6 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glVertexAttribPointer
 import gln.vertexArray.withVertexArray
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -21,6 +20,8 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadCubemap
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL20.glGetUniformLocation
@@ -134,13 +135,9 @@ private class CubemapsSkybox {
         tex[Object.Skybox.ordinal] = loadCubemap("textures/skybox", "jpg")
     }
 
-
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -153,6 +150,7 @@ private class CubemapsSkybox {
             glUniform(program.model, model)
             glUniform(program.view, view)
             glUniform(program.proj, projection)
+
             // cubes
             withVertexArray(vao[Object.Cube]) {
                 glActiveTexture(GL_TEXTURE0 + semantic.sampler.DIFFUSE)
@@ -173,7 +171,6 @@ private class CubemapsSkybox {
                 glDrawArrays(GL_TRIANGLES, 36)
             }
             glDepthFunc(GL_LESS) // set depth function back to default
-
 
             window.swapAndPoll()
         }

@@ -12,9 +12,10 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
@@ -30,18 +31,15 @@ fun main() {
 }
 
 private class Materials {
-
     val window = initWindow0("Materials")
 
     val lighting = Lighting()
     val lamp = Lamp()
-
     val vbo = intBufferBig(1)
 
     enum class VA { Cube, Light }
 
     val vao = intBufferBig<VA>()
-
     val lightPos = Vec3(1.2f, 1f, 2f)
 
     inner class Lighting : Lamp("shaders/b/_3_1", "materials") {
@@ -63,6 +61,7 @@ private class Materials {
             val specular = glGetUniformLocation(name, "material.specular")
             val shininess = glGetUniformLocation(name, "material.shininess")
         }
+
     }
 
     open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
@@ -74,14 +73,10 @@ private class Materials {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
 
-
         glGenVertexArrays(vao)
-
-        // first, configure the cube's VAO (and VBO)
-        glGenBuffers(vbo)
+        glGenBuffers(vbo) // first, configure the cube's VAO (and VBO)
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glBufferData(GL_ARRAY_BUFFER, verticesCube0, GL_STATIC_DRAW)

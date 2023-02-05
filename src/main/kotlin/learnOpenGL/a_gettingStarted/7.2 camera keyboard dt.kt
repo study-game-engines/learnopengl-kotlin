@@ -14,9 +14,7 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
-import learnOpenGL.common.flipY
-import learnOpenGL.common.readImage
-import learnOpenGL.common.toBuffer
+import learnOpenGL.common.*
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.EXTABGR
 import org.lwjgl.opengl.GL11.*
@@ -68,8 +66,8 @@ private class CameraKeyboardDt {
 
         init {
             usingProgram(name) {
-                "textureA".unitE = Texture.A
-                "textureB".unitE = Texture.B
+                uniform("textureA", Texture.A.ordinal)
+                uniform("textureB", Texture.B.ordinal)
 
                 glm.perspective(45f.rad, window.aspect, 0.1f, 100f) to "projection"
             }
@@ -113,7 +111,7 @@ private class CameraKeyboardDt {
         // load image, create texture and generate mipmaps
         var image = readImage("textures/container.jpg").flipY()
         image.toBuffer().use {
-            glTexImage2D(GL_RGB, image.width, image.height, GL_BGR, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_BGR, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
@@ -130,7 +128,7 @@ private class CameraKeyboardDt {
         // load image, create texture and generate mipmaps
         image = readImage("textures/awesomeface.png").flipY()
         image.toBuffer().use {
-            glTexImage2D(GL_RGB, image.width, image.height, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
@@ -142,9 +140,7 @@ private class CameraKeyboardDt {
     }
 
     fun run() {
-
         while (window.open) {
-
             // per-frame time logic
             val currentFrame = glfw.time.toFloat()
             deltaTime = currentFrame - lastFrame
@@ -163,20 +159,17 @@ private class CameraKeyboardDt {
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
             usingProgram(program.name) {
-
                 // camera/view transformation
                 glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp) to program.view
 
                 // render boxes
                 glBindVertexArray(vao)
                 cubePositions.forEachIndexed { i, vec3 ->
-
                     // calculate the model matrix for each object and pass it to shader before drawing
                     val model = Mat4() translate_ vec3
                     val angle = 20.0f * i
                     model.rotate_(angle.rad, 1.0f, 0.3f, 0.5f)
                     model to program.model
-
                     glDrawArrays(GL_TRIANGLES, 36)
                 }
             }
@@ -196,21 +189,13 @@ private class CameraKeyboardDt {
 
     /** process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly   */
     fun GlfwWindow.processInput0() {
-
         processInput()
 
         val cameraSpeed = 2.5f * deltaTime
         if (window.pressed(GLFW_KEY_W)) cameraPos += cameraSpeed * cameraFront
         if (window.pressed(GLFW_KEY_S)) cameraPos -= cameraSpeed * cameraFront
-        if (window.pressed(GLFW_KEY_A)) cameraPos -= glm.normalize(
-            glm.cross(
-                cameraFront,
-                cameraUp
-            )
-        ) * cameraSpeed  // glm classic
-        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalize() * cameraSpeed    // glm enhanced
-
-        // TODO up/down?
+        if (window.pressed(GLFW_KEY_A)) cameraPos -= glm.normalize(glm.cross(cameraFront, cameraUp)) * cameraSpeed
+        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalize() * cameraSpeed
     }
 
 }

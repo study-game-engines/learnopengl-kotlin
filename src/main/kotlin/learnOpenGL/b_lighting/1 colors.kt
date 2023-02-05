@@ -17,9 +17,9 @@ import gln.uniform.glUniform3
 import learnOpenGL.a_gettingStarted.*
 import learnOpenGL.common.Camera
 import learnOpenGL.common.Camera.Movement.*
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
@@ -46,10 +46,8 @@ var deltaTime = 0f    // time between current frame and last frame
 var lastFrame = 0f
 
 fun initWindow0(title: String) = initWindow(title).apply {
-
     cursorPosCallback = ::mouseCallback
     scrollCallback = { xoffset, yoffset -> camera.processMouseScroll(yoffset.f) }
-
     cursor = Disabled
 }
 
@@ -114,31 +112,26 @@ private class Colors {
     val lightPos = Vec3(1.2f, 1f, 2f)
 
     inner class Lighting : Lamp("colors") {
-
         val objCol = glGetUniformLocation(name, "objectColor")
         val lgtCol = glGetUniformLocation(name, "lightColor")
     }
 
-    inner open class Lamp(shader: String = "lamp") : Program("shaders/b/_1", "$shader.vert", "$shader.frag") {
+    open inner class Lamp(shader: String = "lamp") : Program("shaders/b/_1", "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
         val proj = glGetUniformLocation(name, "projection")
+
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
 
-
         glGenVertexArrays(vao)
-
-        // first, configure the cube's VAO (and VBO)
         glGenBuffers(vbo)
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-
         glBindVertexArray(vao[VA.Cube])
 
         // position attribute
@@ -156,11 +149,8 @@ private class Colors {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
@@ -186,15 +176,11 @@ private class Colors {
             glBindVertexArray(vao[VA.Cube])
             glDrawArrays(GL_TRIANGLES, 36)
 
-
             // also draw the lamp object
             glUseProgram(lamp.name)
-
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
-            model = model
-                .translate(lightPos)
-                .scale(0.2f) // a smaller cube
+            model = model.translate(lightPos).scale(0.2f)
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
@@ -220,7 +206,6 @@ private class Colors {
  *  - frame time logic
  *  - all input, query GLFW whether relevant keys are pressed/released this frame and react accordingly   */
 fun GlfwWindow.processFrame() {
-
     val currentFrame = glfw.time.toFloat()
     deltaTime = currentFrame - lastFrame
     lastFrame = currentFrame
@@ -231,8 +216,6 @@ fun GlfwWindow.processFrame() {
     if (pressed(GLFW_KEY_S)) camera.processKeyboard(Backward, deltaTime)
     if (pressed(GLFW_KEY_A)) camera.processKeyboard(Left, deltaTime)
     if (pressed(GLFW_KEY_D)) camera.processKeyboard(Right, deltaTime)
-
-    // TODO up/down?
 }
 
 fun mouseCallback(x: Double, y: Double) {

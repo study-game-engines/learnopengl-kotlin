@@ -12,6 +12,7 @@ import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.readImage
 import learnOpenGL.common.toBuffer
+import learnOpenGL.common.use
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL12.GL_BGR
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
@@ -22,6 +23,7 @@ import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
+import java.awt.image.BufferedImage
 
 fun main() {
     with(Textures()) {
@@ -31,7 +33,6 @@ fun main() {
 }
 
 private class Textures {
-
     val window = initWindow("Textures")
 
     val program = ProgramA()
@@ -67,7 +68,6 @@ private class Textures {
     }
 
     init {
-
         //  set up vertex data (and buffer(s)) and configure vertex attributes
         glGenVertexArrays(vao)
         glGenBuffers(buffers)
@@ -88,12 +88,11 @@ private class Textures {
         glVertexAttribPointer(semantic.attr.TEX_COORD, Vec2.length, GL_FLOAT, false, Vec3.size + Vec2.size, Vec3.size)
         glEnableVertexAttribArray(semantic.attr.TEX_COORD)
 
-
         // load and create a texture
         glGenTextures(texture)
-        //  all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+        // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
         glBindTexture(GL_TEXTURE_2D, texture)
-        //  set the texture wrapping parameters to GL_REPEAT (default wrapping method)
+        // set the texture wrapping parameters to GL_REPEAT (default wrapping method)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         // set texture filtering parameters
@@ -101,23 +100,16 @@ private class Textures {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         // load image, create texture and generate mipmaps
-        val image = readImage("textures/container.jpg")
+        val image: BufferedImage = readImage("textures/container.jpg")
         image.toBuffer().use {
             // ByteBuffered images used BRG instead RGB
-            glTexImage2D(GL_RGB, image.width, image.height, GL_BGR, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_BGR, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
-        } // byteBuffer automatically dispose with `use{ .. }`
-
-        /*  You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens.
-            Modifying other VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs)
-            when it's not directly necessary.   */
-        //glBindVertexArray()
+        }
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processInput()
 
             //  render
@@ -133,21 +125,17 @@ private class Textures {
             glBindVertexArray(vao)
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT)
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(buffers)
         glDeleteTextures(texture)
-
         destroyBuf(vao, buffers, texture)
-
         window.end()
     }
+
 }

@@ -13,13 +13,14 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -125,7 +126,7 @@ private class BlendingDiscard {
     val vbo = intBufferBig<Object>()
     val tex = intBufferBig<Object>()
 
-    inner open class ProgramA : Program("shaders/d/_3_1", "blending.vert", "blending.frag") {
+    open inner class ProgramA : Program("shaders/d/_3_1", "blending.vert", "blending.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -134,6 +135,7 @@ private class BlendingDiscard {
         init {
             usingProgram(name) { "texture1".unit = semantic.sampler.DIFFUSE }
         }
+
     }
 
     init {
@@ -142,7 +144,6 @@ private class BlendingDiscard {
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             glBufferData(GL_ARRAY_BUFFER, verticesCube2[i.ordinal], GL_STATIC_DRAW)
@@ -199,7 +200,6 @@ private class BlendingDiscard {
                 glUniform(program.model, model)
                 glDrawArrays(GL_TRIANGLES, 6)
             }
-
 
             window.swapAndPoll()
         }

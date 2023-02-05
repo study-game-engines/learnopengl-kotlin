@@ -13,10 +13,11 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
+import learnOpenGL.common.glEnableVertexAttribArray
+import learnOpenGL.common.glVertexAttribPointer
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -34,7 +35,6 @@ fun main() {
 }
 
 private class LightCastersDirectional {
-
     val window = initWindow0("Light Caster Directional")
 
     val lighting = Lighting()
@@ -66,6 +66,7 @@ private class LightCastersDirectional {
         inner class Material {
             val shininess = glGetUniformLocation(name, "material.shininess")
         }
+
     }
 
     open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
@@ -148,7 +149,6 @@ private class LightCastersDirectional {
             // render containers
             glBindVertexArray(vao[VA.Cube])
             cubePositions.forEachIndexed { i, pos ->
-
                 // calculate the model matrix for each object and pass it to shader before drawing
                 val model = Mat4().translate(pos)
                 val angle = 20f * i

@@ -4,6 +4,7 @@ import assimp.AiMaterial
 import assimp.AiMesh
 import assimp.AiScene
 import assimp.AiTexture
+import gli_.Texture
 import glm_.set
 import gln.draw.glDrawElements
 import gln.get
@@ -102,15 +103,10 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
      * The required info is returned as a Texture struct.
      */
     fun loadMaterialTexture(assimpTex: AiMaterial.Texture, scene: AiScene) = initTexture2d {
+        val gliTexture: Texture = scene.textures[assimpTex.file]!!
+        TODO("glTexImage2D(gliTexture.target.i, gliTexture.baseLevel, gliTexture.format.i, gliTexture.extent().x,  gliTexture.extent().y, 0,  gliTexture.format.i, gliTexture.format.i, gliTexture.data())")
 
-        val gliTexture = scene.textures[assimpTex.file]!!
-
-//        val format = gli.gl.translate(gliTexture.format, gliTexture.swizzles)
-//        image(format.internal, gliTexture.)
-//        glTexImage2D(format, gliTexture)
-        image(gliTexture)
         glGenerateMipmap(GL_TEXTURE_2D)
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)

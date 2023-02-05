@@ -12,7 +12,6 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.a_gettingStarted.verticesCube
@@ -20,6 +19,8 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
+import learnOpenGL.common.glVertexAttribPointer
+import learnOpenGL.common.glEnableVertexAttribArray
 import learnOpenGL.common.loadTexture
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
@@ -68,7 +69,6 @@ private class StencilTesting {
         glEnable(GL_STENCIL_TEST)
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF)
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
@@ -87,9 +87,7 @@ private class StencilTesting {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
 
             // render
@@ -108,8 +106,10 @@ private class StencilTesting {
             glUniform(program.proj, projection)
             glUniform(program.view, view)
 
-            /*  draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers.
-                We set its mask to 0x00 to not write to the stencil buffer. */
+            /*
+                draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers.
+                We set its mask to 0x00 to not write to the stencil buffer.
+            */
             glStencilMask(0x00)
             // floor
             glBindVertexArray(vao[Object.Plane])
@@ -132,9 +132,11 @@ private class StencilTesting {
             glUniform(program.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
 
-            /*  2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
+            /*
+                2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
                 Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not
-                drawn, thus only drawing the objects' size differences, making it look like borders.    */
+                drawn, thus only drawing the objects' size differences, making it look like borders.
+            */
             glStencilFunc(GL_NOTEQUAL, 1, 0xFF)
             glStencilMask(0x00)
             glDisable(GL_DEPTH_TEST)

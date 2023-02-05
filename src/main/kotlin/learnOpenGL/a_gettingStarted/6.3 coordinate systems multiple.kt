@@ -13,9 +13,7 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
-import learnOpenGL.common.flipY
-import learnOpenGL.common.readImage
-import learnOpenGL.common.toBuffer
+import learnOpenGL.common.*
 import org.lwjgl.opengl.EXTABGR
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL12.GL_BGR
@@ -73,8 +71,8 @@ private class CoordinateSystemsMultipleObjects {
             /*  Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
             Code passed to usingProgram() {..] is executed using the given program, which at the end gets unbound   */
             usingProgram(name) {
-                "textureA".unitE = Texture.A
-                "textureB".unitE = Texture.B
+                uniform("textureA", Texture.A.ordinal)
+                uniform("textureB", Texture.B.ordinal)
             }
         }
     }
@@ -116,7 +114,7 @@ private class CoordinateSystemsMultipleObjects {
         // load image, create texture and generate mipmaps
         var image = readImage("textures/container.jpg").flipY()
         image.toBuffer().use {
-            glTexImage2D(GL_RGB, image.width, image.height, GL_BGR, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_BGR, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
@@ -133,7 +131,7 @@ private class CoordinateSystemsMultipleObjects {
         // load image, create texture and generate mipmaps
         image = readImage("textures/awesomeface.png").flipY()
         image.toBuffer().use {
-            glTexImage2D(GL_RGB, image.width, image.height, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, EXTABGR.GL_ABGR_EXT, GL_UNSIGNED_BYTE, it)
             glGenerateMipmap(GL_TEXTURE_2D)
         }
 
