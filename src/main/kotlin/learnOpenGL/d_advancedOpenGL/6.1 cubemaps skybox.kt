@@ -1,22 +1,17 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 13/05/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.draw.glDrawArrays
 import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.set
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import gln.vertexArray.withVertexArray
 import learnOpenGL.a_gettingStarted.end
@@ -28,71 +23,65 @@ import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
 import learnOpenGL.common.loadCubemap
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(CubemapsSkybox()) {
         run()
         end()
     }
 }
 
-val verticesSkybox = floatArrayOf( // positions
-        -1f, +1f, -1f,
-        -1f, -1f, -1f,
-        +1f, -1f, -1f,
-        +1f, -1f, -1f,
-        +1f, +1f, -1f,
-        -1f, +1f, -1f,
+val verticesSkybox = floatArrayOf(
+    // positions
+    -1f, +1f, -1f,
+    -1f, -1f, -1f,
+    +1f, -1f, -1f,
+    +1f, -1f, -1f,
+    +1f, +1f, -1f,
+    -1f, +1f, -1f,
 
-        -1f, -1f, +1f,
-        -1f, -1f, -1f,
-        -1f, +1f, -1f,
-        -1f, +1f, -1f,
-        -1f, +1f, +1f,
-        -1f, -1f, +1f,
+    -1f, -1f, +1f,
+    -1f, -1f, -1f,
+    -1f, +1f, -1f,
+    -1f, +1f, -1f,
+    -1f, +1f, +1f,
+    -1f, -1f, +1f,
 
-        +1f, -1f, -1f,
-        +1f, -1f, +1f,
-        +1f, +1f, +1f,
-        +1f, +1f, +1f,
-        +1f, +1f, -1f,
-        +1f, -1f, -1f,
+    +1f, -1f, -1f,
+    +1f, -1f, +1f,
+    +1f, +1f, +1f,
+    +1f, +1f, +1f,
+    +1f, +1f, -1f,
+    +1f, -1f, -1f,
 
-        -1f, -1f, +1f,
-        -1f, +1f, +1f,
-        +1f, +1f, +1f,
-        +1f, +1f, +1f,
-        +1f, -1f, +1f,
-        -1f, -1f, +1f,
+    -1f, -1f, +1f,
+    -1f, +1f, +1f,
+    +1f, +1f, +1f,
+    +1f, +1f, +1f,
+    +1f, -1f, +1f,
+    -1f, -1f, +1f,
 
-        -1f, +1f, -1f,
-        +1f, +1f, -1f,
-        +1f, +1f, +1f,
-        +1f, +1f, +1f,
-        -1f, +1f, +1f,
-        -1f, +1f, -1f,
+    -1f, +1f, -1f,
+    +1f, +1f, -1f,
+    +1f, +1f, +1f,
+    +1f, +1f, +1f,
+    -1f, +1f, +1f,
+    -1f, +1f, -1f,
 
-        -1f, -1f, -1f,
-        -1f, -1f, +1f,
-        +1f, -1f, -1f,
-        +1f, -1f, -1f,
-        -1f, -1f, +1f,
-        +1f, -1f, +1f)
+    -1f, -1f, -1f,
+    -1f, -1f, +1f,
+    +1f, -1f, -1f,
+    +1f, -1f, -1f,
+    -1f, -1f, +1f,
+    +1f, -1f, +1f
+)
 
 private class CubemapsSkybox {
-
     val window = initWindow0("Cubemaps Skybox")
 
     val program = ProgramA()
@@ -108,24 +97,24 @@ private class CubemapsSkybox {
         val model = glGetUniformLocation(name, "model")
     }
 
-    open inner class ProgramSkybox(shader: String = "skybox") : Program("shaders/d/_6_1", "$shader.vert", "$shader.frag") {
+    open inner class ProgramSkybox(shader: String = "skybox") :
+        Program("shaders/d/_6_1", "$shader.vert", "$shader.frag") {
+
         val view = glGetUniformLocation(name, "view")
         val proj = glGetUniformLocation(name, "projection")
 
         init {
             usingProgram(name) { "texture1".unit = semantic.sampler.DIFFUSE }
         }
+
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             if (i == Object.Cube) {
@@ -139,9 +128,10 @@ private class CubemapsSkybox {
             }
             glBindVertexArray()
         }
+
         // load textures
-        tex[Object.Cube] = loadTexture("textures/marble.jpg")
-        tex[Object.Skybox] = loadCubemap("textures/skybox", "jpg")
+        tex[Object.Cube.ordinal] = loadTexture("textures/marble.jpg")
+        tex[Object.Skybox.ordinal] = loadCubemap("textures/skybox", "jpg")
     }
 
 
@@ -156,7 +146,7 @@ private class CubemapsSkybox {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // draw scene as normal
-            glUseProgram(program)
+            glUseProgram(program.name)
             val model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100f)
@@ -172,7 +162,7 @@ private class CubemapsSkybox {
 
             // draw skybox as last
             glDepthFunc(GL_LEQUAL)  // change depth function so depth test passes when values are equal to depth buffer's content
-            glUseProgram(skyboxProgram)
+            glUseProgram(skyboxProgram.name)
             view put camera.viewMatrix.toMat3().toMat4() // remove translation from the view matrix
             glUniform(skyboxProgram.view, view)
             glUniform(skyboxProgram.proj, projection)
@@ -190,14 +180,13 @@ private class CubemapsSkybox {
     }
 
     fun end() {
-
-        glDeletePrograms(program, skyboxProgram)
+        glDeleteProgram(program.name)
+        glDeleteProgram(skyboxProgram.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

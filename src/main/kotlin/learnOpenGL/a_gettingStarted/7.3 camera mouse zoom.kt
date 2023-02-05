@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by elect on 26/04/17.
- */
-
 import glm_.f
 import glm_.func.cos
 import glm_.func.rad
@@ -22,8 +18,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.flipY
@@ -41,17 +35,12 @@ import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glfw.GlfwWindow
 import uno.glfw.GlfwWindow.Cursor.Disabled
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(CameraMouseZoom()) {
         run()
         end()
@@ -59,7 +48,6 @@ fun main(args: Array<String>) {
 }
 
 private class CameraMouseZoom {
-
     val window = initWindow("Camera Mouse Zoom")
 
     val program = ProgramA()
@@ -72,11 +60,12 @@ private class CameraMouseZoom {
     val textures = intBufferBig<Texture>()
 
     // camera
-    val cameraPos = Vec3(0f, 0f, 3f)
+    var cameraPos = Vec3(0f, 0f, 3f)
     var cameraFront = Vec3(0f, 0f, -1f)
     val cameraUp = Vec3(0f, 1f, 0f)
 
     var firstMouse = true
+
     /*  yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we
         initially rotate a bit to the left.     */
     var yaw = -90f
@@ -104,12 +93,11 @@ private class CameraMouseZoom {
     }
 
     init {
-
         with(window) {
             cursorPosCallback = ::mouseCallback
             // glfw: whenever the mouse scroll wheel scrolls, this callback is called
-            scrollCallback = { offset ->
-                if (fov in 1f..45f) fov -= offset.y.f
+            scrollCallback = { xoffset, yoffset ->
+                if (fov in 1f..45f) fov -= yoffset.f
                 fov = glm.clamp(fov, 1f, 45f)
             }
 
@@ -182,11 +170,10 @@ private class CameraMouseZoom {
     }
 
     fun run() {
-
         while (window.open) {
 
             // per-frame time logic
-            val currentFrame = glfw.time
+            val currentFrame = glfw.time.toFloat()
             deltaTime = currentFrame - lastFrame
             lastFrame = currentFrame
 
@@ -197,12 +184,12 @@ private class CameraMouseZoom {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 // pass projection matrix to shader (note that in this case it could change every frame)
                 glm.perspective(fov.rad, window.aspect, 0.1f, 100f) to program.proj
@@ -229,14 +216,11 @@ private class CameraMouseZoom {
     }
 
     fun end() {
-
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
 
@@ -248,24 +232,26 @@ private class CameraMouseZoom {
         val cameraSpeed = 2.5 * deltaTime
         if (window.pressed(GLFW_KEY_W)) cameraPos += cameraSpeed * cameraFront
         if (window.pressed(GLFW_KEY_S)) cameraPos -= cameraSpeed * cameraFront
-        if (window.pressed(GLFW_KEY_A)) cameraPos -= (cameraFront cross cameraUp).normalizeAssign() * cameraSpeed
-        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalizeAssign() * cameraSpeed
+        if (window.pressed(GLFW_KEY_A)) cameraPos -= (cameraFront cross cameraUp).normalize() * cameraSpeed
+        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalize() * cameraSpeed
 
         // TODO up/down?
     }
 
     /** glfw: whenever the mouse moves, this callback is called */
-    fun mouseCallback(pos: Vec2d) {
-
+    fun mouseCallback(x: Double, y: Double) {
         if (firstMouse) {
-            last put pos
+            last.x = x
+            last.y = y
             firstMouse = false
         }
 
         val offset = Vec2d(
-                pos.x - last.x,
-                last.y - pos.y) // reversed since y-coordinates go from bottom to top
-        last put pos
+            x - last.x,
+            last.y - y
+        ) // reversed since y-coordinates go from bottom to top
+        last.x = x
+        last.y = y
 
         val sensitivity = 0.1f // change this value to your liking
         offset *= sensitivity
@@ -277,9 +263,11 @@ private class CameraMouseZoom {
         pitch = glm.clamp(pitch, -89f, 89f)
 
         val front = Vec3(
-                x = cos(glm.radians(yaw)) * cos(glm.radians(pitch)), // classic glm
-                y = sin(pitch.rad),                 // one glm alternative
-                z = yaw.rad.sin * pitch.rad.cos)    // another glm alternative
-        cameraFront = front.normalizeAssign()
+            x = cos(glm.radians(yaw)) * cos(glm.radians(pitch)), // classic glm
+            y = sin(pitch.rad),                 // one glm alternative
+            z = yaw.rad.sin * pitch.rad.cos
+        )    // another glm alternative
+        cameraFront = front.normalize()
     }
+
 }

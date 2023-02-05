@@ -7,13 +7,7 @@ import org.lwjgl.opengl.GL11.glViewport
 import uno.glfw.GlfwWindow
 import uno.glfw.glfw
 
-
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(HelloWindow()) {
         run()
         end()
@@ -44,10 +38,10 @@ private class HelloWindow {
             // Make the window visible
             show()
             // glfw: whenever the window size changed (by OS or user resize) this callback function executes
-            framebufferSizeCallback = { size ->
+            framebufferSizeCallback = { w, h ->
                 /*  make sure the viewport matches the new window dimensions; note that width and height will be
                     significantly larger than specified on retina displays.     */
-                glViewport(0, 0, size.x, size.y)
+                glViewport(0, 0, w, h)
             }
         }
         /* This line is critical for LWJGL's interoperation with GLFW's OpenGL context, or any context that is managed

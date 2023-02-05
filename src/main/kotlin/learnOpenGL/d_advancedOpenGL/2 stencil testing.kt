@@ -1,22 +1,17 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 13/05/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.draw.glDrawArrays
 import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.set
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -26,21 +21,15 @@ import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(StencilTesting()) {
         run()
         end()
@@ -48,7 +37,6 @@ fun main(args: Array<String>) {
 }
 
 private class StencilTesting {
-
     val window = initWindow0("Depth Testing View")
 
     val program = ProgramB()
@@ -60,7 +48,8 @@ private class StencilTesting {
     val vbo = intBufferBig<Object>()
     val tex = intBufferBig<Object>()
 
-    inner open class ProgramA(vertex: String = "stencil-testing.vert", fragment: String = "stencil-single-color.frag") : Program("shaders/d/_2", vertex, fragment) {
+    open inner class ProgramA(vertex: String = "stencil-testing.vert", fragment: String = "stencil-single-color.frag") :
+        Program("shaders/d/_2", vertex, fragment) {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -74,19 +63,16 @@ private class StencilTesting {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LESS)
         glEnable(GL_STENCIL_TEST)
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF)
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
 
-
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             glBufferData(GL_ARRAY_BUFFER, if (i == Object.Cube) verticesCube else planeVertices, GL_STATIC_DRAW)
@@ -96,8 +82,8 @@ private class StencilTesting {
         }
 
         // load textures
-        tex[Object.Cube] = loadTexture("textures/marble.jpg")
-        tex[Object.Plane] = loadTexture("textures/metal.png")
+        tex[Object.Cube.ordinal] = loadTexture("textures/marble.jpg")
+        tex[Object.Plane.ordinal] = loadTexture("textures/metal.png")
     }
 
     fun run() {
@@ -111,14 +97,14 @@ private class StencilTesting {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL_STENCIL_BUFFER_BIT) // don't forget to clear the stencil buffer!
 
             // set uniforms
-            glUseProgram(programSingleColor)
+            glUseProgram(programSingleColor.name)
             var model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100f)
             glUniform(programSingleColor.proj, projection)
             glUniform(programSingleColor.view, view)
 
-            glUseProgram(program)
+            glUseProgram(program.name)
             glUniform(program.proj, projection)
             glUniform(program.view, view)
 
@@ -152,38 +138,32 @@ private class StencilTesting {
             glStencilFunc(GL_NOTEQUAL, 1, 0xFF)
             glStencilMask(0x00)
             glDisable(GL_DEPTH_TEST)
-            glUseProgram(programSingleColor)
+            glUseProgram(programSingleColor.name)
             val scale = 1.1f
             // cubes
             glBindVertexArray(vao[Object.Cube])
-            model = Mat4()
-                    .translate_(-1f, 0f, -1f)
-                    .scale_(scale)
+            model = Mat4().translate_(-1f, 0f, -1f).scale_(scale)
             glUniform(programSingleColor.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
-            model = Mat4()
-                    .translate_(2f, 0f, 0f)
-                    .scale_(scale)
+            model = Mat4().translate_(2f, 0f, 0f).scale_(scale)
             glUniform(programSingleColor.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
             glBindVertexArray(0)
             glStencilMask(0xFF)
             glEnable(GL_DEPTH_TEST)
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeletePrograms(program, programSingleColor)
+        glDeleteProgram(program.name)
+        glDeleteProgram(programSingleColor.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

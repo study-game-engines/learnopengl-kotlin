@@ -1,9 +1,5 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 28.04.2017.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.glm.sin
@@ -16,24 +12,17 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(Materials()) {
         run()
         end()
@@ -76,7 +65,8 @@ private class Materials {
         }
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -112,27 +102,21 @@ private class Materials {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
 
             glUniform(lighting.lgt.pos, lightPos)
             glUniform(lighting.viewPos, camera.position)
 
             // light properties
-            val lightColor = Vec3(
-                    x = sin(glfw.time * 2f),
-                    y = sin(glfw.time * 0.7f),
-                    z = sin(glfw.time * 1.3f))
+            val lightColor = Vec3(x = sin(glfw.time * 2f), y = sin(glfw.time * 0.7f), z = sin(glfw.time * 1.3f))
             val diffuseColor = lightColor * 0.5f    // decrease the influence
             val ambientColor = diffuseColor * 0.2f  // low influence
             glUniform(lighting.lgt.ambient, ambientColor)
@@ -159,33 +143,27 @@ private class Materials {
             glBindVertexArray(vao[VA.Cube])
             glDrawArrays(GL_TRIANGLES, 36)
 
-
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
-            model = model
-                    .translate(lightPos)
-                    .scale(0.2f) // a smaller cube
+            model = model.translate(lightPos).scale(0.2f) // a smaller cube
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
             glDrawArrays(GL_TRIANGLES, 36)
-
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

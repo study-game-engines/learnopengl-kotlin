@@ -1,21 +1,15 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
+// import imgui.impl.LwjglGL3
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
-import gln.buffer.glBufferData
 import gln.draw.glDrawArrays
 import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
 import imgui.ImGui
 import imgui.WindowFlags
-import imgui.functionalProgramming.withWindow
-import imgui.impl.LwjglGL3
 import imgui.or
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL15.*
@@ -25,8 +19,7 @@ import org.lwjgl.opengl.GL30.glGenVertexArrays
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(HelloTriangle()) {
         run()
         end()
@@ -34,7 +27,6 @@ fun main(args: Array<String>) {
 }
 
 private class HelloTriangle {
-
     val window = initWindow("Hello Triangle")
 
     val vertexShaderSource = """
@@ -66,9 +58,10 @@ private class HelloTriangle {
     val vao = intBufferBig(1)
 
     val vertices = floatArrayOf(
-            -0.5f, -0.5f, 0f, // left
-            +0.5f, -0.5f, 0f, // right
-            +0.0f, +0.5f, 0f) // top
+        -0.5f, -0.5f, 0f, // left
+        +0.5f, -0.5f, 0f, // right
+        +0.0f, +0.5f, 0f
+    ) // top
 
     init {
         //  build and compile our shader program
@@ -141,13 +134,17 @@ private class HelloTriangle {
 
             with(ImGui) {
                 setNextWindowPos(Vec2(10))
-                withWindow("Overlay", ::showOverlay, WindowFlags.NoTitleBar or WindowFlags.NoResize or WindowFlags.AlwaysAutoResize or WindowFlags.NoMove or WindowFlags.NoSavedSettings) {
+                withWindow(
+                    "Overlay",
+                    ::showOverlay,
+                    WindowFlags.NoTitleBar or WindowFlags.NoResize or WindowFlags.AlwaysAutoResize or WindowFlags.NoMove or WindowFlags.NoSavedSettings
+                ) {
                     text("Polygon Mode:")
                     radioButton("GL_LINE", ::polygonMode, 0); sameLine(); radioButton("GL_FILL", ::polygonMode, 1)
                 }
             }
 
-            glPolygonMode(GL_FRONT_AND_BACK, if(polygonMode == 0) GL_LINE else GL_FILL)
+            glPolygonMode(GL_FRONT_AND_BACK, if (polygonMode == 0) GL_LINE else GL_FILL)
 
             //  render
             glClearColor(clearColor)
@@ -169,18 +166,14 @@ private class HelloTriangle {
     }
 
     fun end() {
-
         LwjglGL3.shutdown()
 
         //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(shaderProgram)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }
-
-

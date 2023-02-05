@@ -1,10 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 25.04.2017.
- */
-
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -16,8 +11,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
@@ -35,14 +28,10 @@ import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.floatBufferBig
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(CoordinateSystemsDepth()) {
         run()
         end()
@@ -50,47 +39,48 @@ fun main(args: Array<String>) {
 }
 
 val verticesCube = floatArrayOf(
-        -0.5f, -0.5f, -0.5f, 0f, 0f,
-        +0.5f, -0.5f, -0.5f, 1f, 0f,
-        +0.5f, +0.5f, -0.5f, 1f, 1f,
-        +0.5f, +0.5f, -0.5f, 1f, 1f,
-        -0.5f, +0.5f, -0.5f, 0f, 1f,
-        -0.5f, -0.5f, -0.5f, 0f, 0f,
+    -0.5f, -0.5f, -0.5f, 0f, 0f,
+    +0.5f, -0.5f, -0.5f, 1f, 0f,
+    +0.5f, +0.5f, -0.5f, 1f, 1f,
+    +0.5f, +0.5f, -0.5f, 1f, 1f,
+    -0.5f, +0.5f, -0.5f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, 0f, 0f,
 
-        -0.5f, -0.5f, +0.5f, 0f, 0f,
-        +0.5f, -0.5f, +0.5f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, 1f, 1f,
-        +0.5f, +0.5f, +0.5f, 1f, 1f,
-        -0.5f, +0.5f, +0.5f, 0f, 1f,
-        -0.5f, -0.5f, +0.5f, 0f, 0f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f,
+    +0.5f, -0.5f, +0.5f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 1f,
+    +0.5f, +0.5f, +0.5f, 1f, 1f,
+    -0.5f, +0.5f, +0.5f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f,
 
-        -0.5f, +0.5f, +0.5f, 1f, 0f,
-        -0.5f, +0.5f, -0.5f, 1f, 1f,
-        -0.5f, -0.5f, -0.5f, 0f, 1f,
-        -0.5f, -0.5f, -0.5f, 0f, 1f,
-        -0.5f, -0.5f, +0.5f, 0f, 0f,
-        -0.5f, +0.5f, +0.5f, 1f, 0f,
+    -0.5f, +0.5f, +0.5f, 1f, 0f,
+    -0.5f, +0.5f, -0.5f, 1f, 1f,
+    -0.5f, -0.5f, -0.5f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f,
+    -0.5f, +0.5f, +0.5f, 1f, 0f,
 
-        +0.5f, +0.5f, +0.5f, 1f, 0f,
-        +0.5f, +0.5f, -0.5f, 1f, 1f,
-        +0.5f, -0.5f, -0.5f, 0f, 1f,
-        +0.5f, -0.5f, -0.5f, 0f, 1f,
-        +0.5f, -0.5f, +0.5f, 0f, 0f,
-        +0.5f, +0.5f, +0.5f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f,
+    +0.5f, +0.5f, -0.5f, 1f, 1f,
+    +0.5f, -0.5f, -0.5f, 0f, 1f,
+    +0.5f, -0.5f, -0.5f, 0f, 1f,
+    +0.5f, -0.5f, +0.5f, 0f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f,
 
-        -0.5f, -0.5f, -0.5f, 0f, 1f,
-        +0.5f, -0.5f, -0.5f, 1f, 1f,
-        +0.5f, -0.5f, +0.5f, 1f, 0f,
-        +0.5f, -0.5f, +0.5f, 1f, 0f,
-        -0.5f, -0.5f, +0.5f, 0f, 0f,
-        -0.5f, -0.5f, -0.5f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, 0f, 1f,
+    +0.5f, -0.5f, -0.5f, 1f, 1f,
+    +0.5f, -0.5f, +0.5f, 1f, 0f,
+    +0.5f, -0.5f, +0.5f, 1f, 0f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f,
+    -0.5f, -0.5f, -0.5f, 0f, 1f,
 
-        -0.5f, +0.5f, -0.5f, 0f, 1f,
-        +0.5f, +0.5f, -0.5f, 1f, 1f,
-        +0.5f, +0.5f, +0.5f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, 1f, 0f,
-        -0.5f, +0.5f, +0.5f, 0f, 0f,
-        -0.5f, +0.5f, -0.5f, 0f, 1f)
+    -0.5f, +0.5f, -0.5f, 0f, 1f,
+    +0.5f, +0.5f, -0.5f, 1f, 1f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f,
+    -0.5f, +0.5f, +0.5f, 0f, 0f,
+    -0.5f, +0.5f, -0.5f, 0f, 1f
+)
 
 private class CoordinateSystemsDepth {
 
@@ -196,15 +186,15 @@ private class CoordinateSystemsDepth {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 //  create transformations
-                val model = glm.rotate(Mat4(), glfw.time, 0.5f, 1f, 0f)
+                val model = glm.rotate(Mat4(), glfw.time.toFloat(), 0.5f, 1f, 0f)
                 val view = glm.translate(Mat4(), 0f, 0f, -3f)
                 val projection = glm.perspective(45f.rad, window.aspect, 0.1f, 100f)
 
@@ -226,15 +216,12 @@ private class CoordinateSystemsDepth {
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures, matBuffer)
-
         window.end()
     }
+
 }

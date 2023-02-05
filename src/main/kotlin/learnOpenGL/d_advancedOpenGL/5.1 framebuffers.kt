@@ -1,12 +1,9 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 13/05/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.draw.glDrawArrays
 import gln.framebuffer.glBindFramebuffer
 import gln.framebuffer.glFramebufferRenderbuffer
@@ -17,11 +14,8 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.renderbuffer.glBindRenderbuffer
 import gln.renderbuffer.glRenderbufferStorage
-import gln.set
-import gln.texture.glTexImage2D
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -40,14 +34,9 @@ import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
-import uno.glsl.usingProgram
 import java.awt.Color
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(Framebuffers()) {
         run()
         end()
@@ -75,14 +64,15 @@ private class Framebuffers {
 
     /** vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates. */
     val quadVertices = floatArrayOf(
-    // positions    | texCoords
-            -1f, +1f, 0f, 1f,
-            -1f, -1f, 0f, 0f,
-            +1f, -1f, 1f, 0f,
+        // positions    | texCoords
+        -1f, +1f, 0f, 1f,
+        -1f, -1f, 0f, 0f,
+        +1f, -1f, 1f, 0f,
 
-            -1f, +1f, 0f, 1f,
-            +1f, -1f, 1f, 0f,
-            +1f, +1f, 1f, 1f)
+        -1f, +1f, 0f, 1f,
+        +1f, -1f, 1f, 0f,
+        +1f, +1f, 1f, 1f
+    )
 
     inner open class ProgramRender : Program("shaders/d/_5_1", "framebuffers.vert", "framebuffers.frag") {
 
@@ -97,12 +87,11 @@ private class Framebuffers {
 
     inner open class ProgramSplash : Program("shaders/d/_5_1", "framebuffers-screen.vert", "framebuffers-screen.frag") {
         init {
-            usingProgram(this) { "screenTexture".unit = semantic.sampler.DIFFUSE }
+            usingProgram(this.name) { "screenTexture".unit = semantic.sampler.DIFFUSE }
         }
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
 
         glGenVertexArrays(vao)
@@ -124,15 +113,15 @@ private class Framebuffers {
             glBindVertexArray()
         }
         // load textures
-        tex[Tex.Cube] = loadTexture("textures/marble.jpg")
-        tex[Tex.Floor] = loadTexture("textures/metal.png")
+        tex[Tex.Cube.ordinal] = loadTexture("textures/marble.jpg")
+        tex[Tex.Floor.ordinal] = loadTexture("textures/metal.png")
 
         // framebuffer configuration
         // -------------------------
         glGenFramebuffers(framebuffer)
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
         // create a color attachment texture
-        tex[Tex.ColorBuffer] = glGenTextures()
+        tex[Tex.ColorBuffer.ordinal] = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, tex[Tex.ColorBuffer])
         glTexImage2D(GL_RGB8, windowSize, GL_RGB, GL_UNSIGNED_BYTE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
@@ -141,8 +130,17 @@ private class Framebuffers {
         // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
         glGenRenderbuffers(rbo)
         glBindRenderbuffer(GL_RENDERBUFFER, rbo)
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowSize) // use a single renderbuffer object for both a depth AND stencil buffer.
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo) // now actually attach it
+        glRenderbufferStorage(
+            GL_RENDERBUFFER,
+            GL_DEPTH24_STENCIL8,
+            windowSize
+        ) // use a single renderbuffer object for both a depth AND stencil buffer.
+        glFramebufferRenderbuffer(
+            GL_FRAMEBUFFER,
+            GL_DEPTH_STENCIL_ATTACHMENT,
+            GL_RENDERBUFFER,
+            rbo
+        ) // now actually attach it
         // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             System.err.println("ERROR::FRAMEBUFFER:: Framebuffer is not complete!")
@@ -168,7 +166,7 @@ private class Framebuffers {
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-            glUseProgram(programRender)
+            glUseProgram(programRender.name)
             var model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100.0f)
@@ -182,7 +180,7 @@ private class Framebuffers {
             glUniform(programRender.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
             model = Mat4()
-                    .translate_(2f, 0f, 0f)
+                .translate_(2f, 0f, 0f)
             glUniform(programRender.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
             // floor
@@ -199,9 +197,12 @@ private class Framebuffers {
             glClearColor(Color.white) // not really necessary actually, since we won't be able to see behind the quad anyways
             glClear(GL_COLOR_BUFFER_BIT)
 
-            glUseProgram(programSplash)
+            glUseProgram(programSplash.name)
             glBindVertexArray(vao[Object.Quad])
-            glBindTexture(GL_TEXTURE_2D, tex[Tex.ColorBuffer])    // use the color attachment texture as the texture of the quad plane
+            glBindTexture(
+                GL_TEXTURE_2D,
+                tex[Tex.ColorBuffer]
+            )    // use the color attachment texture as the texture of the quad plane
             glDrawArrays(GL_TRIANGLES, 6)
 
             window.swapAndPoll()
@@ -209,14 +210,13 @@ private class Framebuffers {
     }
 
     fun end() {
-
-        glDeletePrograms(programRender, programSplash)
+        glDeleteProgram(programRender.name)
+        glDeleteProgram(programSplash.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

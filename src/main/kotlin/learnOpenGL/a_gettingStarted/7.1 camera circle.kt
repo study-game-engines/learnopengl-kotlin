@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by elect on 26/04/17.
- */
-
 import glm_.func.cos
 import glm_.func.rad
 import glm_.func.sin
@@ -17,8 +13,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.flipY
@@ -35,14 +29,10 @@ import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(CameraCircle()) {
         run()
         end()
@@ -50,7 +40,6 @@ fun main(args: Array<String>) {
 }
 
 private class CameraCircle {
-
     val window = initWindow("Camera Circle")
 
     val program = ProgramA()
@@ -147,12 +136,12 @@ private class CameraCircle {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 // camera/view transformation
                 val radius = 10f
@@ -180,14 +169,12 @@ private class CameraCircle {
     }
 
     fun end() {
-
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
+
 }

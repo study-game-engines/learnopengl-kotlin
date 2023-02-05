@@ -1,21 +1,14 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
 import glm_.vec4.Vec4
 import gln.glClearColor
-import gln.glViewport
 import org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
-import org.lwjgl.opengl.GL11.glClear
+import org.lwjgl.opengl.GL11.*
 import uno.glfw.GlfwWindow
 import uno.glfw.glfw
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(HelloWindowClear()) {
         run()
         end()
@@ -58,14 +51,15 @@ fun initWindow(title: String): GlfwWindow {
     return GlfwWindow(windowSize, title).apply {
         makeContextCurrent()
         show()
-        framebufferSizeCallback = { size -> glViewport(size) }
+        framebufferSizeCallback = { w, h ->
+            glViewport(0, 0, w, h)
+        }
     }.also {
         GL.createCapabilities()
     }
 }
 
 val clearColor = Vec4(0.2f, 0.3f, 0.3f, 1f)
-
 
 fun GlfwWindow.end() {
     destroy()

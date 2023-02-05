@@ -1,16 +1,11 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 13/05/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
 import glm_.set
 import gln.draw.glDrawArrays
 import gln.get
-import gln.set
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
@@ -18,28 +13,18 @@ import gln.program.usingProgram
 import gln.texture.glBindTexture
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
-import learnOpenGL.a_gettingStarted.verticesCube
 import learnOpenGL.b_lighting.*
 import learnOpenGL.common.loadCubemap
-import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(CubemapsEnvironmentMapping()) {
         run()
         end()
@@ -47,7 +32,6 @@ fun main(args: Array<String>) {
 }
 
 private class CubemapsEnvironmentMapping {
-
     val window = initWindow0("Cubemaps Environment Mapping")
 
     val program = ProgramA()
@@ -70,7 +54,8 @@ private class CubemapsEnvironmentMapping {
         }
     }
 
-    open inner class ProgramSkybox(shader: String = "skybox") : Program("shaders/d/_6_1", "$shader.vert", "$shader.frag") {
+    open inner class ProgramSkybox(shader: String = "skybox") :
+        Program("shaders/d/_6_1", "$shader.vert", "$shader.frag") {
         val view = glGetUniformLocation(name, "view")
         val proj = glGetUniformLocation(name, "projection")
 
@@ -80,14 +65,11 @@ private class CubemapsEnvironmentMapping {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             if (i == Object.Cube) {
@@ -105,19 +87,15 @@ private class CubemapsEnvironmentMapping {
         texCubemap[0] = loadCubemap("textures/skybox", "jpg")
     }
 
-
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // draw scene as normal
-            glUseProgram(program)
+            glUseProgram(program.name)
             val model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100f)
@@ -134,7 +112,7 @@ private class CubemapsEnvironmentMapping {
 
             // draw skybox as last
             glDepthFunc(GL_LEQUAL)  // change depth function so depth test passes when values are equal to depth buffer's content
-            glUseProgram(skyboxProgram)
+            glUseProgram(skyboxProgram.name)
             view put camera.viewMatrix.toMat3().toMat4() // remove translation from the view matrix
             glUniform(skyboxProgram.view, view)
             glUniform(skyboxProgram.proj, projection)
@@ -146,20 +124,18 @@ private class CubemapsEnvironmentMapping {
             glBindVertexArray()
             glDepthFunc(GL_LESS) // set depth function back to default
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeletePrograms(program, skyboxProgram)
+        glDeleteProgram(program.name)
+        glDeleteProgram(skyboxProgram.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(texCubemap)
-
         destroyBuf(vao, vbo, texCubemap)
-
         window.end()
     }
+
 }

@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawElements
@@ -11,17 +7,13 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glDeleteVertexArrays
 import org.lwjgl.opengl.GL30.glGenVertexArrays
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(HelloTriangleIndexed()) {
         run()
         end()
@@ -29,7 +21,6 @@ fun main(args: Array<String>) {
 }
 
 internal class HelloTriangleIndexed {
-
     val window = initWindow("Hello Triangle Indexed")
 
     val vertexShaderSource = """
@@ -63,15 +54,15 @@ internal class HelloTriangleIndexed {
     val vao = intBufferBig(1)
 
     val vertices = floatArrayOf(
-            +0.5f, +0.5f, 0f, // top right
-            +0.5f, -0.5f, 0f, // bottom right
-            -0.5f, -0.5f, 0f, // bottom left
-            -0.5f, +0.5f, 0f  // top left
+        +0.5f, +0.5f, 0f, // top right
+        +0.5f, -0.5f, 0f, // bottom right
+        -0.5f, -0.5f, 0f, // bottom left
+        -0.5f, +0.5f, 0f  // top left
     )
     val indices = intArrayOf(
-            // note that we start from 0!
-            0, 1, 3, // first Triangle
-            1, 2, 3  // second Triangle
+        // note that we start from 0!
+        0, 1, 3, // first Triangle
+        1, 2, 3  // second Triangle
     )
 
 
@@ -164,14 +155,12 @@ internal class HelloTriangleIndexed {
     }
 
     fun end() {
-
         //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(shaderProgram)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(buffers)
-
         destroyBuf(vao, buffers)
-
         window.end()
     }
+
 }

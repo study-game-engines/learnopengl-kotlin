@@ -5,12 +5,7 @@ import assimp.AiScene
 import assimp.Importer
 import uno.kotlin.uri
 
-/**
- * Created by GBarbieri on 02.05.2017.
- */
-
 class Model(path: String) {
-
     /*  Model Data */
     val meshes = ArrayList<Mesh>()
 
@@ -47,4 +42,5 @@ class Model(path: String) {
     fun draw(diffuse: Boolean = false, specular: Boolean = false) = meshes.forEach { it.draw(diffuse, specular) }
 
     fun dispose() = meshes.forEach(Mesh::dispose)
+
 }

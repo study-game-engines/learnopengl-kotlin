@@ -1,24 +1,18 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 06/05/2017.
- */
-
 import gli_.gli
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.draw.glDrawArrays
 import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.set
-import gln.texture.glTexImage2D
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -36,13 +30,9 @@ import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 import uno.kotlin.uri
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(DepthTesting()) {
         run()
         end()
@@ -50,15 +40,15 @@ fun main(args: Array<String>) {
 }
 
 val planeVertices = floatArrayOf(
-        /* positions        | texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture
-                                                wrapping mode). this will cause the floor texture to repeat)    */
-        +5f, -0.5f, +5f, 2f, 0f,
-        -5f, -0.5f, +5f, 0f, 0f,
-        -5f, -0.5f, -5f, 0f, 2f,
+    // positions     uv
+    +5f, -0.5f, +5f, 2f, 0f,
+    -5f, -0.5f, +5f, 0f, 0f,
+    -5f, -0.5f, -5f, 0f, 2f,
 
-        +5f, -0.5f, +5f, 2f, 0f,
-        -5f, -0.5f, -5f, 0f, 2f,
-        +5f, -0.5f, -5f, 2f, 2f)
+    +5f, -0.5f, +5f, 2f, 0f,
+    -5f, -0.5f, -5f, 0f, 2f,
+    +5f, -0.5f, -5f, 2f, 2f
+)
 
 private class DepthTesting {
 
@@ -84,7 +74,6 @@ private class DepthTesting {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_ALWAYS) // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
 
@@ -92,7 +81,6 @@ private class DepthTesting {
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             glBufferData(GL_ARRAY_BUFFER, if (i == Object.Cube) verticesCube else planeVertices, GL_STATIC_DRAW)
@@ -102,12 +90,11 @@ private class DepthTesting {
         }
 
         // load textures
-        tex[Object.Cube] = loadTexture("textures/marble.jpg")
-        tex[Object.Plane] = loadTexture("textures/metal.png")
+        tex[Object.Cube.ordinal] = loadTexture("textures/marble.jpg")
+        tex[Object.Plane.ordinal] = loadTexture("textures/metal.png")
     }
 
     fun loadTexture(path: String): Int {
-
         val textureID = glGenTextures()
 
         val texture = gli.load(path.uri)
@@ -129,16 +116,14 @@ private class DepthTesting {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
 
             // render
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-            glUseProgram(program)
+            glUseProgram(program.name)
             var model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100f)
@@ -168,14 +153,12 @@ private class DepthTesting {
     }
 
     fun end() {
-
-        glDeletePrograms(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

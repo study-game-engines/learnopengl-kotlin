@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by elect on 24/04/17.
- */
-
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawArrays
@@ -11,19 +7,14 @@ import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
-import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
+import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glDeleteVertexArrays
 import org.lwjgl.opengl.GL30.glGenVertexArrays
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.glUseProgram
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(ShadersClass()) {
         run()
         end()
@@ -31,7 +22,6 @@ fun main(args: Array<String>) {
 }
 
 private class ShadersClass {
-
     val window = initWindow("Shaders Class")
 
     // build and compile our shader program, we can simply use it as int for the moment
@@ -41,10 +31,10 @@ private class ShadersClass {
     val vao = intBufferBig(1)
 
     val vertices = floatArrayOf(
-            // positions | colors
-            +0.5f, -0.5f, 0f, 1f, 0f, 0f, // bottom right
-            -0.5f, -0.5f, 0f, 0f, 1f, 0f, // bottom left
-            +0.0f, +0.5f, 0f, 0f, 0f, 1f  // top
+        // positions | colors
+        +0.5f, -0.5f, 0f, 1f, 0f, 0f, // bottom right
+        -0.5f, -0.5f, 0f, 0f, 1f, 0f, // bottom left
+        +0.0f, +0.5f, 0f, 0f, 0f, 1f  // top
     )
 
     class ProgramA : Program("shaders/a/_3_3", "shader.vert", "shader.frag")
@@ -74,9 +64,7 @@ private class ShadersClass {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processInput()
 
             //  render
@@ -84,7 +72,7 @@ private class ShadersClass {
             glClear(GL_COLOR_BUFFER_BIT)
 
             // render the triangle
-            glUseProgram(program)
+            glUseProgram(program.name)
             glBindVertexArray(vao)
             glDrawArrays(GL_TRIANGLES, 3)
 
@@ -94,14 +82,12 @@ private class ShadersClass {
     }
 
     fun end() {
-
         //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

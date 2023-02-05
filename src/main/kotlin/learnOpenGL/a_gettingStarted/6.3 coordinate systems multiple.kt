@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 25.04.2017.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -15,8 +11,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.flipY
@@ -33,13 +27,9 @@ import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(CoordinateSystemsMultipleObjects()) {
         run()
         end()
@@ -48,16 +38,17 @@ fun main(args: Array<String>) {
 
 // world space positions of our cubes
 val cubePositions = arrayOf(
-        Vec3(0f, 0f, 0f),
-        Vec3(2f, 5f, -15f),
-        Vec3(-1.5f, -2.2f, -2.5f),
-        Vec3(-3.8f, -2f, -12.3f),
-        Vec3(2.4f, -0.4f, -3.5f),
-        Vec3(-1.7f, 3f, -7.5f),
-        Vec3(1.3f, -2f, -2.5f),
-        Vec3(1.5f, 2f, -2.5f),
-        Vec3(1.5f, 0.2f, -1.5f),
-        Vec3(-1.3f, 1f, -1.5f))
+    Vec3(0f, 0f, 0f),
+    Vec3(2f, 5f, -15f),
+    Vec3(-1.5f, -2.2f, -2.5f),
+    Vec3(-3.8f, -2f, -12.3f),
+    Vec3(2.4f, -0.4f, -3.5f),
+    Vec3(-1.7f, 3f, -7.5f),
+    Vec3(1.3f, -2f, -2.5f),
+    Vec3(1.5f, 2f, -2.5f),
+    Vec3(1.5f, 0.2f, -1.5f),
+    Vec3(-1.3f, 1f, -1.5f)
+)
 
 private class CoordinateSystemsMultipleObjects {
 
@@ -164,12 +155,12 @@ private class CoordinateSystemsMultipleObjects {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 //  create transformations
                 glm.translate(Mat4(), 0f, 0f, -3f) to program.view
@@ -178,13 +169,11 @@ private class CoordinateSystemsMultipleObjects {
                 // render boxes
                 glBindVertexArray(vao)
                 cubePositions.forEachIndexed { i, vec3 ->
-
                     // calculate the model matrix for each object and pass it to shader before drawing
                     val model = Mat4() translate_ vec3
                     val angle = 20f * i
                     model.rotate_(angle.rad, 1f, 0.3f, 0.5f)
                     model to program.model
-
                     glDrawArrays(GL_TRIANGLES, 36)
                 }
             }
@@ -194,15 +183,12 @@ private class CoordinateSystemsMultipleObjects {
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
+
 }

@@ -1,9 +1,5 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 27.04.2017.
- */
-
 import glm_.f
 import glm_.func.rad
 import glm_.glm
@@ -18,8 +14,6 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
-import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.*
 import learnOpenGL.common.Camera
 import learnOpenGL.common.Camera.Movement.*
@@ -34,12 +28,8 @@ import uno.glfw.GlfwWindow
 import uno.glfw.GlfwWindow.Cursor.Disabled
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(Colors()) {
         run()
         end()
@@ -58,7 +48,7 @@ var lastFrame = 0f
 fun initWindow0(title: String) = initWindow(title).apply {
 
     cursorPosCallback = ::mouseCallback
-    scrollCallback = { offset -> camera.processMouseScroll(offset.y.f) }
+    scrollCallback = { xoffset, yoffset -> camera.processMouseScroll(yoffset.f) }
 
     cursor = Disabled
 }
@@ -77,47 +67,48 @@ private class Colors {
     val vao = intBufferBig<VA>()
 
     val vertices = floatArrayOf(
-            -0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            -0.5f, +0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        -0.5f, +0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-            -0.5f, -0.5f, +0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
 
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
 
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
 
-            -0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, -0.5f, +0.5f,
-            -0.5f, -0.5f, +0.5f,
-            -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-            -0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, -0.5f)
+        -0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, -0.5f
+    )
 
     // lighting
     val lightPos = Vec3(1.2f, 1f, 2f)
@@ -176,7 +167,7 @@ private class Colors {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
 
             glUniform(lighting.objCol, 1f, 0.5f, 0.31f)
             glUniform3(lighting.lgtCol, 1f)
@@ -197,13 +188,13 @@ private class Colors {
 
 
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
             model = model
-                    .translate(lightPos)
-                    .scale(0.2f) // a smaller cube
+                .translate(lightPos)
+                .scale(0.2f) // a smaller cube
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
@@ -215,16 +206,14 @@ private class Colors {
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }
 
 /** process:
@@ -232,7 +221,7 @@ private class Colors {
  *  - all input, query GLFW whether relevant keys are pressed/released this frame and react accordingly   */
 fun GlfwWindow.processFrame() {
 
-    val currentFrame = glfw.time
+    val currentFrame = glfw.time.toFloat()
     deltaTime = currentFrame - lastFrame
     lastFrame = currentFrame
 
@@ -246,18 +235,16 @@ fun GlfwWindow.processFrame() {
     // TODO up/down?
 }
 
-fun mouseCallback(pos: Vec2d) {
-
+fun mouseCallback(x: Double, y: Double) {
     if (firstMouse) {
-        last put pos
+        last.x = x
+        last.y = y
         firstMouse = false
     }
-
-    val offset = Vec2d(pos.x - last.x, last.y - pos.y)
-    last put pos
-
+    val offset = Vec2d(x - last.x, last.y - y)
+    last.x = x
+    last.y = y
     offset *= 0.1
-
     camera processMouseMovement offset
 }
 

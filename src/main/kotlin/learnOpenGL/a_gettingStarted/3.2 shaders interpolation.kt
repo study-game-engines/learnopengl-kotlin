@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawArrays
@@ -11,16 +7,13 @@ import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glDeleteVertexArrays
 import org.lwjgl.opengl.GL30.glGenVertexArrays
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 
-fun main(args: Array<String>) {
-
+fun main() {
     with(ShadersInterpolation()) {
         run()
         end()
@@ -28,7 +21,6 @@ fun main(args: Array<String>) {
 }
 
 private class ShadersInterpolation {
-
     val window = initWindow("Shaders Interpolation")
 
     val vertexShaderSource = """
@@ -69,10 +61,10 @@ private class ShadersInterpolation {
     val vao = intBufferBig(1)
 
     val vertices = floatArrayOf(
-            // positions | colors
-            +0.5f, -0.5f, 0f, 1f, 0f, 0f, // bottom right
-            -0.5f, -0.5f, 0f, 0f, 1f, 0f, // bottom left
-            +0.0f, +0.5f, 0f, 0f, 0f, 1f  // top
+        // positions | colors
+        +0.5f, -0.5f, 0f, 1f, 0f, 0f, // bottom right
+        -0.5f, -0.5f, 0f, 0f, 1f, 0f, // bottom left
+        +0.0f, +0.5f, 0f, 0f, 0f, 1f  // top
     )
 
 
@@ -152,14 +144,12 @@ private class ShadersInterpolation {
     }
 
     fun end() {
-
         //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(shaderProgram)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

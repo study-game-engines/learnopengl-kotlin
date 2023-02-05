@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 24.04.2017.
- */
-
 import glm_.f
 import glm_.glm.sin
 import glm_.vec3.Vec3
@@ -12,8 +8,6 @@ import gln.draw.glDrawArrays
 import gln.glClearColor
 import gln.glf.semantic
 import gln.vertexArray.glBindVertexArray
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.glDeleteVertexArrays
 import org.lwjgl.opengl.GL30.glGenVertexArrays
@@ -21,9 +15,7 @@ import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glfw.glfw
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(ShadersUniform()) {
         run()
         end()
@@ -31,7 +23,6 @@ fun main(args: Array<String>) {
 }
 
 private class ShadersUniform {
-
     val window = initWindow("Shaders Uniform")
 
     val vertexShaderSource = """
@@ -67,9 +58,9 @@ private class ShadersUniform {
     val vao = intBufferBig(1)
 
     val vertices = floatArrayOf(
-            +0.5f, -0.5f, 0f, // bottom right
-            -0.5f, -0.5f, 0f, // bottom left
-            +0.0f, +0.5f, 0f  // top
+        +0.5f, -0.5f, 0f, // bottom right
+        -0.5f, -0.5f, 0f, // bottom left
+        +0.0f, +0.5f, 0f  // top
     )
 
 
@@ -123,8 +114,10 @@ private class ShadersUniform {
             when it's not directly necessary.   */
         //glBindVertexArray()
 
-        /*  bind the VAO (it was already bound, but just to demonstrate): seeing as we only have a single VAO we can just
-            bind it beforehand before rendering the respective triangle; this is another approach.     */
+        /*
+            bind the VAO (it was already bound, but just to demonstrate): seeing as we only have a single VAO we can just
+            bind it beforehand before rendering the respective triangle; this is another approach.
+        */
         glBindVertexArray(vao)
     }
 
@@ -155,14 +148,12 @@ private class ShadersUniform {
     }
 
     fun end() {
-
         //  optional: de-allocate all resources once they've outlived their purpose:
         glDeleteProgram(shaderProgram)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

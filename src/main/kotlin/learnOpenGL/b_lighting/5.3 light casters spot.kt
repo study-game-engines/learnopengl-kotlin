@@ -1,44 +1,33 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 02.05.2017.
- */
-
 import glm_.func.cos
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawArrays
 import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
-import gln.set
+import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
-import uno.glsl.usingProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(LightCastersSpot()) {
         run()
         end()
@@ -85,7 +74,8 @@ private class LightCastersSpot {
         }
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
+    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -119,11 +109,11 @@ private class LightCastersSpot {
         glEnableVertexAttribArray(glf.pos3_nor3_tc2[0])
 
         // load textures (we now use a utility function to keep the code more organized)
-        textures[Texture.Diffuse] = loadTexture("textures/container2.png")
-        textures[Texture.Specular] = loadTexture("textures/container2_specular.png")
+        textures[Texture.Diffuse.ordinal] = loadTexture("textures/container2.png")
+        textures[Texture.Specular.ordinal] = loadTexture("textures/container2_specular.png")
 
         // shader configuration
-        usingProgram(lighting) {
+        usingProgram(lighting.name) {
             "material.diffuse".unit = semantic.sampler.DIFFUSE
             "material.specular".unit = semantic.sampler.SPECULAR
         }
@@ -141,7 +131,7 @@ private class LightCastersSpot {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
             glUniform(lighting.lgt.pos, camera.position)
             glUniform(lighting.lgt.dir, camera.front)
             glUniform(lighting.lgt.cutOff, 12.5f.rad.cos)
@@ -187,22 +177,18 @@ private class LightCastersSpot {
                 glDrawArrays(GL_TRIANGLES, 36)
             }
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
-
         window.end()
     }
+
 }

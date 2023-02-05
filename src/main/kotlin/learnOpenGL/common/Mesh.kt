@@ -26,12 +26,7 @@ import uno.buffer.intBufferBig
 import uno.buffer.intBufferOf
 import java.nio.IntBuffer
 
-/**
- * Created by GBarbieri on 02.05.2017.
- */
-
 class Mesh(assimpMesh: AiMesh, scene: AiScene) {
-
     val vao = intBufferBig(1)
 
     enum class Buffer { Vertex, Element }
@@ -44,7 +39,6 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
     var specularMap: IntBuffer? = null
 
     init {  // Now that we have all the required data, set the vertex buffers and its attribute pointers.
-
         // Create buffers/arrays
         glGenVertexArrays(vao)
         glGenBuffers(buffers)
@@ -94,7 +88,6 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
 
         // Process materials
         with(scene.materials[assimpMesh.materialIndex]) {
-
             textures.firstOrNull { it.type == AiTexture.Type.diffuse }?.let {
                 diffuseMap = intBufferOf(loadMaterialTexture(it, scene))
             }
@@ -125,7 +118,6 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
     }
 
     fun draw(diffuse: Boolean = false, specular: Boolean = false) {
-
         if (diffuse) diffuseMap?.let {
             glActiveTexture(GL_TEXTURE0 + semantic.sampler.DIFFUSE)
             glBindTexture(GL_TEXTURE_2D, it)
@@ -152,7 +144,6 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
     }
 
     fun dispose() {
-
         glDeleteVertexArrays(vao)
         glDeleteBuffers(buffers)
         diffuseMap?.let {
@@ -164,4 +155,5 @@ class Mesh(assimpMesh: AiMesh, scene: AiScene) {
             it.destroy()
         }
     }
+
 }

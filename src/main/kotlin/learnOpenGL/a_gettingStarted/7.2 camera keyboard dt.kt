@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by elect on 26/04/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -16,8 +12,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.flipY
@@ -35,18 +29,12 @@ import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glfw.GlfwWindow
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(CameraKeyboardDt()) {
-
         run()
         end()
     }
@@ -66,7 +54,7 @@ private class CameraKeyboardDt {
     val textures = intBufferBig<Texture>()
 
     // camera
-    val cameraPos = Vec3(0f, 0f, 3f)
+    var cameraPos = Vec3(0f, 0f, 3f)
     val cameraFront = Vec3(0f, 0f, -1f)
     val cameraUp = Vec3(0f, 1f, 0f)
 
@@ -158,7 +146,7 @@ private class CameraKeyboardDt {
         while (window.open) {
 
             // per-frame time logic
-            val currentFrame = glfw.time
+            val currentFrame = glfw.time.toFloat()
             deltaTime = currentFrame - lastFrame
             lastFrame = currentFrame
 
@@ -169,12 +157,12 @@ private class CameraKeyboardDt {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 // camera/view transformation
                 glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp) to program.view
@@ -198,14 +186,11 @@ private class CameraKeyboardDt {
     }
 
     fun end() {
-
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
 
@@ -214,12 +199,18 @@ private class CameraKeyboardDt {
 
         processInput()
 
-        val cameraSpeed = 2.5 * deltaTime
+        val cameraSpeed = 2.5f * deltaTime
         if (window.pressed(GLFW_KEY_W)) cameraPos += cameraSpeed * cameraFront
         if (window.pressed(GLFW_KEY_S)) cameraPos -= cameraSpeed * cameraFront
-        if (window.pressed(GLFW_KEY_A)) cameraPos -= glm.normalize(glm.cross(cameraFront, cameraUp)) * cameraSpeed  // glm classic
-        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalizeAssign() * cameraSpeed    // glm enhanced
+        if (window.pressed(GLFW_KEY_A)) cameraPos -= glm.normalize(
+            glm.cross(
+                cameraFront,
+                cameraUp
+            )
+        ) * cameraSpeed  // glm classic
+        if (window.pressed(GLFW_KEY_D)) cameraPos += (cameraFront cross cameraUp).normalize() * cameraSpeed    // glm enhanced
 
         // TODO up/down?
     }
+
 }

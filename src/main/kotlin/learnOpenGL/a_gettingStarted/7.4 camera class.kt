@@ -1,9 +1,5 @@
 package learnOpenGL.a_gettingStarted
 
-/**
- * Created by GBarbieri on 27.04.2017.
- */
-
 import glm_.f
 import glm_.func.rad
 import glm_.glm
@@ -17,8 +13,6 @@ import gln.get
 import gln.glClearColor
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.texture.glTexImage2D
-import gln.texture.plus
 import gln.vertexArray.glBindVertexArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.common.Camera
@@ -38,17 +32,12 @@ import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
-import uno.buffer.use
 import uno.glfw.GlfwWindow
 import uno.glfw.GlfwWindow.Cursor.Disabled
 import uno.glfw.glfw
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.usingProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(CameraClass()) {
         run()
         end()
@@ -170,7 +159,7 @@ private class CameraClass {
         while (window.open) {
 
             // per-frame time logic
-            val currentFrame = glfw.time
+            val currentFrame = glfw.time.toFloat()
             deltaTime = currentFrame - lastFrame
             lastFrame = currentFrame
 
@@ -181,12 +170,12 @@ private class CameraClass {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // also clear the depth buffer now!
 
             //  bind textures on corresponding texture units
-            glActiveTexture(GL_TEXTURE0 + Texture.A)
+            glActiveTexture(GL_TEXTURE0 + Texture.A.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.A])
-            glActiveTexture(GL_TEXTURE0 + Texture.B)
+            glActiveTexture(GL_TEXTURE0 + Texture.B.ordinal)
             glBindTexture(GL_TEXTURE_2D, textures[Texture.B])
 
-            usingProgram(program) {
+            usingProgram(program.name) {
 
                 // pass projection matrix to shader (note that in this case it could change every frame)
                 val projection = glm.perspective(camera.zoom.rad, 800.0f / 600.0f, 0.1f, 100.0f)
@@ -215,44 +204,35 @@ private class CameraClass {
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
 
     /** process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly   */
     fun GlfwWindow.processInput0() {
-
         processInput()
-
         if (pressed(GLFW_KEY_W)) camera.processKeyboard(Forward, deltaTime)
         if (pressed(GLFW_KEY_S)) camera.processKeyboard(Backward, deltaTime)
         if (pressed(GLFW_KEY_A)) camera.processKeyboard(Left, deltaTime)
         if (pressed(GLFW_KEY_D)) camera.processKeyboard(Right, deltaTime)
-
-        // TODO up/down?
     }
 
-    /** glfw: whenever the mouse moves, this callback is called */
-    fun mouseCallback(pos: Vec2d) {
-
+    fun mouseCallback(x: Double, y: Double) {
         if (firstMouse) {
-            last put pos
+            last.x = x
+            last.y = y
             firstMouse = false
         }
 
-        val offset = Vec2d(pos.x - last.x, last.y - pos.y)
-        last put pos
-
+        val offset = Vec2d(x - last.x, last.y - y)
+        last.x = x
+        last.y = y
         offset *= 0.1
-
         camera processMouseMovement offset
     }
+
 }

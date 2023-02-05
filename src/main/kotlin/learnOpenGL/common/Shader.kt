@@ -5,10 +5,6 @@ import org.lwjgl.opengl.GL20.*
 import java.io.File
 import kotlin.reflect.KClass
 
-/**
- * Created by elect on 24/04/17.
- */
-
 class Shader(root: String, vertexName: String, fragmentName: String) {
 
     constructor(root: String, shader: String) : this(root, shader, shader)
@@ -16,7 +12,6 @@ class Shader(root: String, vertexName: String, fragmentName: String) {
     val id: Int
 
     init {
-
         //  1. retrieve the vertex/fragment source code from filePath
         val vShaderCode = readFile("$root/$vertexName.vert")
         val fShaderCode = readFile("$root/$fragmentName.frag")
@@ -51,7 +46,6 @@ class Shader(root: String, vertexName: String, fragmentName: String) {
 fun shaderOf(context: KClass<*>, root: String, shader: String) = shaderOf(context, root, shader, shader)
 
 fun shaderOf(context: KClass<*>, root: String, vertexName: String, fragmentName: String): Int {
-
     //  1. retrieve the vertex/fragment source code from filePath
     val vShaderCode = readFile("$root/$vertexName.vert")
     val fShaderCode = readFile("$root/$fragmentName.frag")
@@ -79,20 +73,15 @@ fun shaderOf(context: KClass<*>, root: String, vertexName: String, fragmentName:
     return id
 }
 
-/** utility function for checking shader compilation/linking errors.    */
+// utility function for checking shader compilation/linking errors
 fun checkCompileErrors(shader: Int, type: String) {
-
     if (type != "program") {
-
         if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
-
             val infoLog = glGetShaderInfoLog(shader)
             System.err.println("ERROR::SHADER_COMPILATION_ERROR of type: $type\n$infoLog")
         }
     } else {
-
         if (glGetProgrami(shader, GL_LINK_STATUS) == GL_FALSE) {
-
             val infoLog = glGetProgramInfoLog(shader)
             System.err.println("ERROR::PROGRAM_LINKING_ERROR of type: $type\n$infoLog")
         }

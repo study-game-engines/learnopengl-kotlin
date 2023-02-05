@@ -10,23 +10,15 @@ import glm_.vec3.Vec3
 import learnOpenGL.common.Camera.Movement.*
 
 /**
- * Created by GBarbieri on 27.04.2017.
+ * An abstract camera class that processes input and calculates the corresponding Eular Angles, Vectors and Matrices
  */
-
-/** An abstract camera class that processes input and calculates the corresponding Eular Angles, Vectors and Matrices
- *  for use in OpenGL   */
-class Camera(
-        //  Camera Attributes
-        val position: Vec3 = Vec3(),
-        var worldUp: Vec3 = Vec3(0f, 1f, 0f),
-        //  Eular Angles
-        var yaw: Float = -90f,
-        var pitch: Float = 0f) {
+class Camera(var position: Vec3 = Vec3(), var worldUp: Vec3 = Vec3(0f, 1f, 0f), var yaw: Float = -90f, var pitch: Float = 0f) {
 
     //  Camera Attributes
     var front = Vec3(0f, 0f, -1f)
     var up = Vec3()
     var right = Vec3()
+
     //  Camera options
     var movementSpeed = 2.5f
     var mouseSensitivity = 0.5f
@@ -89,14 +81,16 @@ class Camera(
     fun updateCameraVectors() {
         // Calculate the new Front vector
         front.put(
-                x = yaw.rad.cos * pitch.rad.cos,
-                y = pitch.rad.sin,
-                z = yaw.rad.sin * pitch.rad.cos).normalizeAssign()
+            x = yaw.rad.cos * pitch.rad.cos,
+            y = pitch.rad.sin,
+            z = yaw.rad.sin * pitch.rad.cos
+        ).normalize()
         /*  Also re-calculate the Right and Up vector, by taking care to normalize the vectors, because their length
             gets closer to 0 the more you look up or down which results in slower movement.         */
-        right put (front cross worldUp).normalizeAssign()
-        up put (right cross front).normalizeAssign()
+        right put (front cross worldUp).normalize()
+        up put (right cross front).normalize()
     }
 
     enum class Movement { Forward, Backward, Left, Right }
+
 }

@@ -1,22 +1,17 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 13/05/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import gln.draw.glDrawArrays
 import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
 import gln.program.usingProgram
-import gln.set
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -25,21 +20,15 @@ import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeleteProgram
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(BlendingSort()) {
         run()
         end()
@@ -47,7 +36,6 @@ fun main(args: Array<String>) {
 }
 
 private class BlendingSort {
-
     val window = initWindow0("Blending Sort")
 
     val program = ProgramA()
@@ -70,17 +58,13 @@ private class BlendingSort {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glGenVertexArrays(vao)
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             glBufferData(GL_ARRAY_BUFFER, verticesCube2[i.ordinal], GL_STATIC_DRAW)
@@ -90,15 +74,13 @@ private class BlendingSort {
         }
 
         // load textures
-        tex[Object.Cube] = loadTexture("textures/marble.jpg")
-        tex[Object.Plane] = loadTexture("textures/metal.png")
-        tex[Object.Transparent] = loadTexture("textures/window.png")
+        tex[Object.Cube.ordinal] = loadTexture("textures/marble.jpg")
+        tex[Object.Plane.ordinal] = loadTexture("textures/metal.png")
+        tex[Object.Transparent.ordinal] = loadTexture("textures/window.png")
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
 
             // sort the transparent windows before rendering
@@ -109,7 +91,7 @@ private class BlendingSort {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // draw objects
-            glUseProgram(program)
+            glUseProgram(program.name)
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100f)
             val view = camera.viewMatrix
             var model = Mat4()
@@ -123,8 +105,7 @@ private class BlendingSort {
             model.translate_(-1f, 0f, -1f)
             glUniform(program.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
-            model = Mat4()
-                    .translate_(2f, 0f, 0f)
+            model = Mat4().translate_(2f, 0f, 0f)
             glUniform(program.model, model)
             glDrawArrays(GL_TRIANGLES, 36)
 
@@ -144,20 +125,17 @@ private class BlendingSort {
                 glDrawArrays(GL_TRIANGLES, 6)
             }
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeleteProgram(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

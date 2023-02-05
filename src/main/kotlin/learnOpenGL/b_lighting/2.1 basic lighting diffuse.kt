@@ -1,9 +1,5 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 28.04.2017.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -15,72 +11,65 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3f
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(BasicLightingDiffuse()) {
         run()
         end()
     }
 }
 
-
 val verticesCube0 = floatArrayOf(
-        -0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
-        +0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
-        +0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
-        +0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
-        -0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
-        -0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
+    -0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
+    +0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
+    +0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
+    +0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
+    -0.5f, +0.5f, -0.5f, 0f, 0f, -1f,
+    -0.5f, -0.5f, -0.5f, 0f, 0f, -1f,
 
-        -0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
-        +0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
-        +0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
-        +0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
-        -0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
-        -0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
+    +0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
+    +0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
+    +0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
+    -0.5f, +0.5f, +0.5f, 0f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, 0f, 0f, 1f,
 
-        -0.5f, +0.5f, +0.5f, -1f, 0f, 0f,
-        -0.5f, +0.5f, -0.5f, -1f, 0f, 0f,
-        -0.5f, -0.5f, -0.5f, -1f, 0f, 0f,
-        -0.5f, -0.5f, -0.5f, -1f, 0f, 0f,
-        -0.5f, -0.5f, +0.5f, -1f, 0f, 0f,
-        -0.5f, +0.5f, +0.5f, -1f, 0f, 0f,
+    -0.5f, +0.5f, +0.5f, -1f, 0f, 0f,
+    -0.5f, +0.5f, -0.5f, -1f, 0f, 0f,
+    -0.5f, -0.5f, -0.5f, -1f, 0f, 0f,
+    -0.5f, -0.5f, -0.5f, -1f, 0f, 0f,
+    -0.5f, -0.5f, +0.5f, -1f, 0f, 0f,
+    -0.5f, +0.5f, +0.5f, -1f, 0f, 0f,
 
-        +0.5f, +0.5f, +0.5f, 1f, 0f, 0f,
-        +0.5f, +0.5f, -0.5f, 1f, 0f, 0f,
-        +0.5f, -0.5f, -0.5f, 1f, 0f, 0f,
-        +0.5f, -0.5f, -0.5f, 1f, 0f, 0f,
-        +0.5f, -0.5f, +0.5f, 1f, 0f, 0f,
-        +0.5f, +0.5f, +0.5f, 1f, 0f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f, 0f,
+    +0.5f, +0.5f, -0.5f, 1f, 0f, 0f,
+    +0.5f, -0.5f, -0.5f, 1f, 0f, 0f,
+    +0.5f, -0.5f, -0.5f, 1f, 0f, 0f,
+    +0.5f, -0.5f, +0.5f, 1f, 0f, 0f,
+    +0.5f, +0.5f, +0.5f, 1f, 0f, 0f,
 
-        -0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
-        +0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
-        +0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
-        +0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
-        -0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
-        -0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
+    -0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
+    +0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
+    +0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
+    +0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
+    -0.5f, -0.5f, +0.5f, 0f, -1f, 0f,
+    -0.5f, -0.5f, -0.5f, 0f, -1f, 0f,
 
-        -0.5f, +0.5f, -0.5f, 0f, 1f, 0f,
-        +0.5f, +0.5f, -0.5f, 0f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
-        -0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
-        -0.5f, +0.5f, -0.5f, 0f, 1f, 0f)
+    -0.5f, +0.5f, -0.5f, 0f, 1f, 0f,
+    +0.5f, +0.5f, -0.5f, 0f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
+    -0.5f, +0.5f, +0.5f, 0f, 1f, 0f,
+    -0.5f, +0.5f, -0.5f, 0f, 1f, 0f
+)
 
 private class BasicLightingDiffuse {
 
@@ -133,7 +122,8 @@ private class BasicLightingDiffuse {
         val lgtPos = glGetUniformLocation(name, "lightPos")
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -152,7 +142,7 @@ private class BasicLightingDiffuse {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
 
             glUniform3f(lighting.objCol, 1f, 0.5f, 0.31f)
             glUniform3f(lighting.lgtCol, 1f)
@@ -173,13 +163,13 @@ private class BasicLightingDiffuse {
             glDrawArrays(GL_TRIANGLES, 36)
 
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
             model = model
-                    .translate(lightPos)
-                    .scale(0.2f) // a smaller cube
+                .translate(lightPos)
+                .scale(0.2f) // a smaller cube
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
@@ -190,14 +180,12 @@ private class BasicLightingDiffuse {
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

@@ -4,14 +4,10 @@ apply plugin: 'kotlin'
 
 buildscript {
 
-    ext.kotlinVersion = '1.2.20-eap-11'
+    ext.kotlinVersion = '1.7.10'
 
     repositories {
         mavenCentral()
-        jcenter()
-        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
-        maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     dependencies {
@@ -21,11 +17,9 @@ buildscript {
 
 
 dependencies {
-
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-
-    compile 'com.github.kotlin-graphics:assimp:1be72df603febc1b6b22dd5c7085af12aa1a832b'
-    compile 'com.github.kotlin-graphics:imgui:e95c70b926890359d5419f887f0a667389548557'
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api 'com.github.kotlin-graphics:assimp:v4.0'
+    api 'com.github.kotlin-graphics:imgui:v1.79'
 
     switch ( OperatingSystem.current() ) {
         case OperatingSystem.WINDOWS:
@@ -38,25 +32,22 @@ dependencies {
             ext.lwjglNatives = "natives-macos"
             break
     }
-    ext.lwjglVersion = "3.1.5-SNAPSHOT"
-    compile "org.lwjgl:lwjgl:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-openal:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
-    runtime "org.lwjgl:lwjgl:${lwjglVersion}:${lwjglNatives}"
-    runtime "org.lwjgl:lwjgl-glfw:${lwjglVersion}:${lwjglNatives}"
-    runtime "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}:${lwjglNatives}"
-    runtime "org.lwjgl:lwjgl-openal:${lwjglVersion}:${lwjglNatives}"
-    runtime "org.lwjgl:lwjgl-opengl:${lwjglVersion}:${lwjglNatives}"
-    runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
+    ext.lwjglVersion = "3.3.1"
+    api "org.lwjgl:lwjgl:${lwjglVersion}"
+    api "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
+    api "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
+    api "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+    api "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+    api "org.lwjgl:lwjgl-stb:${lwjglVersion}"
+    api "org.lwjgl:lwjgl:${lwjglVersion}:${lwjglNatives}"
+    api "org.lwjgl:lwjgl-glfw:${lwjglVersion}:${lwjglNatives}"
+    api "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}:${lwjglNatives}"
+    api "org.lwjgl:lwjgl-openal:${lwjglVersion}:${lwjglNatives}"
+    api "org.lwjgl:lwjgl-opengl:${lwjglVersion}:${lwjglNatives}"
+    api "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
-    maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url 'https://jitpack.io' }
 }

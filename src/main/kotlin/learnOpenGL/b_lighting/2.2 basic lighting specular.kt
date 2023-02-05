@@ -1,9 +1,5 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 28.04.2017.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -15,23 +11,16 @@ import gln.glClearColor
 import gln.glf.glf
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(BasicLightingSpecular()) {
         run()
         end()
@@ -39,7 +28,6 @@ fun main(args: Array<String>) {
 }
 
 private class BasicLightingSpecular {
-
     val window = initWindow0("Basic Lighting Specular")
 
     val lighting = Lighting()
@@ -54,22 +42,20 @@ private class BasicLightingSpecular {
     val lightPos = Vec3(1.2f, 1f, 2f)
 
     inner class Lighting : Lamp("shaders/b/_2_2", "basic-lighting") {
-
         val objCol = glGetUniformLocation(name, "objectColor")
         val lgtCol = glGetUniformLocation(name, "lightColor")
         val lgtPos = glGetUniformLocation(name, "lightPos")
         val viewPos = glGetUniformLocation(name, "viewPos")
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
-
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
         val proj = glGetUniformLocation(name, "projection")
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
 
 
@@ -97,7 +83,6 @@ private class BasicLightingSpecular {
     }
 
     fun run() {
-
         while (window.open) {
 
             window.processFrame()
@@ -108,7 +93,7 @@ private class BasicLightingSpecular {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
 
             glUniform(lighting.objCol, 1f, 0.5f, 0.31f)
             /*  we can avoid to write this
@@ -134,32 +119,28 @@ private class BasicLightingSpecular {
 
 
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
 
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
             model = model
-                    .translate(lightPos)
-                    .scale(0.2f) // a smaller cube
+                .translate(lightPos)
+                .scale(0.2f) // a smaller cube
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
             glDrawArrays(GL_TRIANGLES, 36)
-
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
-
         destroyBuf(vao, vbo)
-
         window.end()
     }
+
 }

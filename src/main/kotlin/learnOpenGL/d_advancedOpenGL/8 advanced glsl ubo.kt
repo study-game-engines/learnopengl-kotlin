@@ -1,48 +1,32 @@
 package learnOpenGL.d_advancedOpenGL
 
 import glm_.L
-import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
-import glm_.set
 import gln.buffer.glBindBuffer
-import gln.buffer.glBindBufferRange
 import gln.buffer.glBufferData
 import gln.buffer.glBufferSubData
 import gln.draw.glDrawArrays
 import gln.get
-import gln.set
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
-import gln.program.usingProgram
-import gln.texture.glBindTexture
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
-import gln.vertexArray.glVertexAttribPointer
 import gln.vertexArray.initVertexArray
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
-import learnOpenGL.a_gettingStarted.verticesCube
-import learnOpenGL.b_lighting.*
-import learnOpenGL.common.loadCubemap
-import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13.*
-import org.lwjgl.opengl.GL15.*
+import learnOpenGL.b_lighting.camera
+import learnOpenGL.b_lighting.clearColor0
+import learnOpenGL.b_lighting.initWindow0
+import learnOpenGL.b_lighting.processFrame
 import org.lwjgl.opengl.GL20.glGetUniformLocation
-import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL31.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(AdvancedGlslUbo()) {
         run()
         end()
@@ -50,7 +34,6 @@ fun main(args: Array<String>) {
 }
 
 private class AdvancedGlslUbo {
-
     val window = initWindow0("Cubemaps Environment Mapping")
 
     val programRed = ProgramA("red.frag")
@@ -59,51 +42,52 @@ private class AdvancedGlslUbo {
     val programYellow = ProgramA("yellow.frag")
 
     val cubeVertices = floatArrayOf(
-            -0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            -0.5f, +0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        -0.5f, +0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-            -0.5f, -0.5f, +0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
 
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
 
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
 
-            -0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, -0.5f,
-            +0.5f, -0.5f, +0.5f,
-            +0.5f, -0.5f, +0.5f,
-            -0.5f, -0.5f, +0.5f,
-            -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, +0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-            -0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, -0.5f,
-            +0.5f, +0.5f, +0.5f,
-            +0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, +0.5f,
-            -0.5f, +0.5f, -0.5f)
+        -0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, +0.5f,
+        +0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, +0.5f,
+        -0.5f, +0.5f, -0.5f
+    )
 
     val vao = intBufferBig(1)
 
-    enum class Buffer {Vertex, Ubo}
+    enum class Buffer { Vertex, Ubo }
 
     val bufferName = intBufferBig<Buffer>()
 
@@ -112,9 +96,7 @@ private class AdvancedGlslUbo {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
         glGenBuffers(bufferName)
 
         initVertexArray(vao) { array(bufferName[Buffer.Vertex], glf.pos3) }
@@ -145,13 +127,9 @@ private class AdvancedGlslUbo {
         glBindBuffer(GL_UNIFORM_BUFFER)
     }
 
-
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -165,39 +143,39 @@ private class AdvancedGlslUbo {
             // draw 4 cubes
             // RED
             glBindVertexArray(vao)
-            glUseProgram(programRed)
+            glUseProgram(programRed.name)
             var model = Mat4().translate(-0.75f, 0.75f, 0f) // move top-left
             glUniform(programRed.model, model)
             glDrawArrays(36)
             // GREEN
-            glUseProgram(programGreen)
+            glUseProgram(programGreen.name)
             model = Mat4().translate(0.75f, 0.75f, 0f) // move top-right
             glUniform(programGreen.model, model)
             glDrawArrays(36)
             // YELLOW
-            glUseProgram(programBlue)
+            glUseProgram(programBlue.name)
             model = Mat4().translate(-0.75f, -0.75f, 0f) // move bottom-left
             glUniform(programBlue.model, model)
-            glDrawArrays( 36)
+            glDrawArrays(36)
             // BLUE
-            glUseProgram(programYellow)
+            glUseProgram(programYellow.name)
             model = Mat4().translate(0.75f, -0.75f, 0f) // move bottom-right
             glUniform(programYellow.model, model)
             glDrawArrays(36)
-
 
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeletePrograms(programRed, programGreen, programBlue, programYellow)
+        glDeleteProgram(programRed.name)
+        glDeleteProgram(programGreen.name)
+        glDeleteProgram(programBlue.name)
+        glDeleteProgram(programYellow.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(bufferName)
-
         destroyBuf(vao, bufferName)
-
         window.end()
     }
+
 }

@@ -1,13 +1,10 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by GBarbieri on 02.05.2017.
- */
-
 import glm_.func.cos
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
+import glm_.set
 import glm_.vec3.Vec3
 import gln.buffer.glBindBuffer
 import gln.draw.glDrawArrays
@@ -15,31 +12,23 @@ import gln.get
 import gln.glClearColor
 import gln.glf.glf
 import gln.glf.semantic
-import gln.set
+import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.cubePositions
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
-import uno.glsl.usingProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(MultipleLights()) {
         run()
         end()
@@ -47,7 +36,6 @@ fun main(args: Array<String>) {
 }
 
 private class MultipleLights {
-
     val window = initWindow0("Multiple Lights")
 
     val lighting = Lighting()
@@ -61,10 +49,11 @@ private class MultipleLights {
 
     // positions of the point lights
     val pointLightPositions = arrayOf(
-            Vec3(0.7f, 0.2f, 2f),
-            Vec3(2.3f, -3.3f, -4f),
-            Vec3(-4f, 2f, -12f),
-            Vec3(0f, 0f, -3f))
+        Vec3(0.7f, 0.2f, 2f),
+        Vec3(2.3f, -3.3f, -4f),
+        Vec3(-4f, 2f, -12f),
+        Vec3(0f, 0f, -3f)
+    )
 
     enum class Texture { Diffuse, Specular }
 
@@ -113,7 +102,8 @@ private class MultipleLights {
         }
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -121,10 +111,7 @@ private class MultipleLights {
     }
 
     init {
-
         glEnable(GL_DEPTH_TEST)
-
-
         glGenVertexArrays(vao)
 
         // first, configure the cube's VAO (and VBO)
@@ -148,29 +135,26 @@ private class MultipleLights {
         glEnableVertexAttribArray(glf.pos3_nor3_tc2[0])
 
         // load textures (we now use a utility function to keep the code more organized)
-        textures[Texture.Diffuse] = loadTexture("textures/container2.png")
-        textures[Texture.Specular] = loadTexture("textures/container2_specular.png")
+        textures[Texture.Diffuse.ordinal] = loadTexture("textures/container2.png")
+        textures[Texture.Specular.ordinal] = loadTexture("textures/container2_specular.png")
 
         // shader configuration
-        usingProgram(lighting) {
+        usingProgram(lighting.name) {
             "material.diffuse".unit = semantic.sampler.DIFFUSE
             "material.specular".unit = semantic.sampler.SPECULAR
         }
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
-
 
             // render
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
             glUniform(lighting.viewPos, camera.position)
             glUniform(lighting.mtl.shininess, 32f)
 
@@ -239,36 +223,30 @@ private class MultipleLights {
             }
 
             // also draw the lamp object
-            glUseProgram(lamp)
+            glUseProgram(lamp.name)
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
 
             // we now draw as many light bulbs as we have point lights.
             glBindVertexArray(vao[VA.Light])
             pointLightPositions.forEach {
-                val model = Mat4()
-                        .translate(it)
-                        .scale(0.2f) // Make it a smaller cube
-
+                val model = Mat4().translate(it).scale(0.2f) // Make it a smaller cube
                 glUniform(lamp.model, model)
                 glDrawArrays(GL_TRIANGLES, 36)
             }
-
 
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        //  optional: de-allocate all resources once they've outlived their purpose:
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(textures)
-
         destroyBuf(vao, vbo, textures)
-
         window.end()
     }
+
 }

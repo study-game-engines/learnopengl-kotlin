@@ -1,9 +1,5 @@
 package learnOpenGL.d_advancedOpenGL
 
-/**
- * Created by elect on 07/05/2017.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -15,7 +11,6 @@ import gln.glf.semantic
 import gln.program.usingProgram
 import gln.uniform.glUniform
 import gln.vertexArray.glBindVertexArray
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
@@ -24,19 +19,13 @@ import learnOpenGL.b_lighting.camera
 import learnOpenGL.b_lighting.clearColor0
 import learnOpenGL.b_lighting.initWindow0
 import learnOpenGL.b_lighting.processFrame
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(DepthTestingView()) {
         run()
         end()
@@ -44,7 +33,6 @@ fun main(args: Array<String>) {
 }
 
 private class DepthTestingView {
-
     val window = initWindow0("Depth Testing View")
 
     val program: ProgramA
@@ -67,7 +55,6 @@ private class DepthTestingView {
         glGenBuffers(vbo)
 
         for (i in Object.values()) {
-
             glBindVertexArray(vao[i])
             glBindBuffer(GL_ARRAY_BUFFER, vbo[i])
             glBufferData(GL_ARRAY_BUFFER, if (i == Object.Cube) verticesCube else planeVertices, GL_STATIC_DRAW)
@@ -89,16 +76,14 @@ private class DepthTestingView {
     }
 
     fun run() {
-
         while (window.open) {
-
             window.processFrame()
 
             // render
             glClearColor(clearColor0)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-            glUseProgram(program)
+            glUseProgram(program.name)
             var model = Mat4()
             val view = camera.viewMatrix
             val projection = glm.perspective(camera.zoom.rad, window.aspect, 0.1f, 100.0f)
@@ -119,20 +104,17 @@ private class DepthTestingView {
             glDrawArrays(GL_TRIANGLES, 6)
             glBindVertexArray()
 
-
             window.swapAndPoll()
         }
     }
 
     fun end() {
-
-        glDeletePrograms(program)
+        glDeleteProgram(program.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(tex)
-
         destroyBuf(vao, vbo, tex)
-
         window.end()
     }
+
 }

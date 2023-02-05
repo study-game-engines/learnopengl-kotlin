@@ -1,9 +1,5 @@
 package learnOpenGL.b_lighting
 
-/**
- * Created by elect on 29/04/17.
- */
-
 import glm_.func.rad
 import glm_.glm
 import glm_.mat4x4.Mat4
@@ -18,26 +14,19 @@ import gln.glf.semantic
 import gln.texture.glBindTexture
 import gln.uniform.glUniform
 import gln.uniform.glUniform3
-import gln.vertexArray.glEnableVertexAttribArray
 import gln.vertexArray.glVertexAttribPointer
 import learnOpenGL.a_gettingStarted.end
 import learnOpenGL.a_gettingStarted.swapAndPoll
 import learnOpenGL.common.loadTexture
-import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.glGetUniformLocation
 import org.lwjgl.opengl.GL30.*
 import uno.buffer.destroyBuf
 import uno.buffer.intBufferBig
 import uno.glsl.Program
-import uno.glsl.glDeletePrograms
-import uno.glsl.glUseProgram
 
-
-fun main(args: Array<String>) {
-
+fun main() {
     with(LightingMapsDiffuse()) {
         run()
         end()
@@ -45,48 +34,49 @@ fun main(args: Array<String>) {
 }
 
 val verticesCube1 = floatArrayOf(
-        // positions       | normals      | texture coords
-        -0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 0f, 0f,
-        +0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 1f, 0f,
-        +0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 1f, 1f,
-        +0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 1f, 1f,
-        -0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 0f, 1f,
-        -0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 0f, 0f,
+    // positions       | normals      | texture coords
+    -0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 0f, 0f,
+    +0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 1f, 0f,
+    +0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 1f, 1f,
+    +0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 1f, 1f,
+    -0.5f, +0.5f, -0.5f, +0f, +0f, -1f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, +0f, +0f, -1f, 0f, 0f,
 
-        -0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 0f, 0f,
-        +0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 1f, 1f,
-        +0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 1f, 1f,
-        -0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 0f, 1f,
-        -0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 0f, 0f,
+    -0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 0f, 0f,
+    +0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 1f, 1f,
+    +0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 1f, 1f,
+    -0.5f, +0.5f, +0.5f, +0f, +0f, +1f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, +0f, +0f, +1f, 0f, 0f,
 
-        -0.5f, +0.5f, +0.5f, -1f, +0f, +0f, 1f, 0f,
-        -0.5f, +0.5f, -0.5f, -1f, +0f, +0f, 1f, 1f,
-        -0.5f, -0.5f, -0.5f, -1f, +0f, +0f, 0f, 1f,
-        -0.5f, -0.5f, -0.5f, -1f, +0f, +0f, 0f, 1f,
-        -0.5f, -0.5f, +0.5f, -1f, +0f, +0f, 0f, 0f,
-        -0.5f, +0.5f, +0.5f, -1f, +0f, +0f, 1f, 0f,
+    -0.5f, +0.5f, +0.5f, -1f, +0f, +0f, 1f, 0f,
+    -0.5f, +0.5f, -0.5f, -1f, +0f, +0f, 1f, 1f,
+    -0.5f, -0.5f, -0.5f, -1f, +0f, +0f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, -1f, +0f, +0f, 0f, 1f,
+    -0.5f, -0.5f, +0.5f, -1f, +0f, +0f, 0f, 0f,
+    -0.5f, +0.5f, +0.5f, -1f, +0f, +0f, 1f, 0f,
 
-        +0.5f, +0.5f, +0.5f, +1f, +0f, +0f, 1f, 0f,
-        +0.5f, +0.5f, -0.5f, +1f, +0f, +0f, 1f, 1f,
-        +0.5f, -0.5f, -0.5f, +1f, +0f, +0f, 0f, 1f,
-        +0.5f, -0.5f, -0.5f, +1f, +0f, +0f, 0f, 1f,
-        +0.5f, -0.5f, +0.5f, +1f, +0f, +0f, 0f, 0f,
-        +0.5f, +0.5f, +0.5f, +1f, +0f, +0f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, +1f, +0f, +0f, 1f, 0f,
+    +0.5f, +0.5f, -0.5f, +1f, +0f, +0f, 1f, 1f,
+    +0.5f, -0.5f, -0.5f, +1f, +0f, +0f, 0f, 1f,
+    +0.5f, -0.5f, -0.5f, +1f, +0f, +0f, 0f, 1f,
+    +0.5f, -0.5f, +0.5f, +1f, +0f, +0f, 0f, 0f,
+    +0.5f, +0.5f, +0.5f, +1f, +0f, +0f, 1f, 0f,
 
-        -0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 0f, 1f,
-        +0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 1f, 1f,
-        +0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 1f, 0f,
-        +0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 1f, 0f,
-        -0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 0f, 0f,
-        -0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 0f, 1f,
+    -0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 0f, 1f,
+    +0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 1f, 1f,
+    +0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 1f, 0f,
+    +0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 1f, 0f,
+    -0.5f, -0.5f, +0.5f, +0f, -1f, +0f, 0f, 0f,
+    -0.5f, -0.5f, -0.5f, +0f, -1f, +0f, 0f, 1f,
 
-        -0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 0f, 1f,
-        +0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 1f, 1f,
-        +0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 1f, 0f,
-        +0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 1f, 0f,
-        -0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 0f, 0f,
-        -0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 0f, 1f)
+    -0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 0f, 1f,
+    +0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 1f, 1f,
+    +0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 1f, 0f,
+    +0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 1f, 0f,
+    -0.5f, +0.5f, +0.5f, +0f, +1f, +0f, 0f, 0f,
+    -0.5f, +0.5f, -0.5f, +0f, +1f, +0f, 0f, 1f
+)
 
 private class LightingMapsDiffuse {
 
@@ -124,7 +114,8 @@ private class LightingMapsDiffuse {
         }
     }
 
-    inner open class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") : Program(root, "$shader.vert", "$shader.frag") {
+    open inner class Lamp(root: String = "shaders/b/_1", shader: String = "lamp") :
+        Program(root, "$shader.vert", "$shader.frag") {
 
         val model = glGetUniformLocation(name, "model")
         val view = glGetUniformLocation(name, "view")
@@ -174,7 +165,7 @@ private class LightingMapsDiffuse {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             // be sure to activate shader when setting uniforms/drawing objects
-            glUseProgram(lighting)
+            glUseProgram(lighting.name)
             glUniform(lighting.lgt.pos, lightPos)
             glUniform(lighting.viewPos, camera.position)
 
@@ -212,8 +203,8 @@ private class LightingMapsDiffuse {
             glUniform(lamp.proj, projection)
             glUniform(lamp.view, view)
             model = model
-                    .translate(lightPos)
-                    .scale(0.2f) // a smaller cube
+                .translate(lightPos)
+                .scale(0.2f) // a smaller cube
             glUniform(lamp.model, model)
 
             glBindVertexArray(vao[VA.Light])
@@ -226,7 +217,8 @@ private class LightingMapsDiffuse {
 
     fun end() {
 
-        glDeletePrograms(lighting, lamp)
+        glDeleteProgram(lighting.name)
+        glDeleteProgram(lamp.name)
         glDeleteVertexArrays(vao)
         glDeleteBuffers(vbo)
         glDeleteTextures(diffuseMap)
